@@ -65,39 +65,29 @@ var game = (function ($) {
         },
         cows: {
             min: 1,
-            max: 3
+            max: 8
         },
         tigers: {
             min: 1,
-            max: 3
+            max: 10
         }
     };
 
+    var gameContainer = null;
+    var _options = null;
+
+    var locationData = [];
+
     // Ядро игры
     var game = {
-        gameContainer: null,
-        options: null,
         init: function ($gameContainer, options) {
             // Общий контейнер
-            this.gameContainer = $gameContainer;
-
+            gameContainer = $gameContainer;
             // Проверим и присвоим опций
-            this.options = options || optionsDefault;
+            _options = options || optionsDefault;
 
-            // Создадим игровое поле
-            plain.init($gameContainer, this.options);
-
-            // Раставим траву
-            grass.init($gameContainer, this.options);
-
-            // Раставим коров
-            cows.init($gameContainer, this.options);
-
-            // Раставим тигров
-            tigers.init($gameContainer, this.options);
-
-            // Раставим еду
-            foods.init($gameContainer, this.options);
+            // создадим сцену ввиде массива и проставим в нем цифры
+            scene.create();
 
             // Запуск игры
             this.run();
@@ -105,282 +95,199 @@ var game = (function ($) {
         run: function () {
 
             // Главный Loop
-            // setInterval(function () {
-            //
-            //     plain.update();
-            //
-            // }, 1000);
+            setInterval(function () {
+                scene.render();
+            }, 1000);
         }
     };
 
-    // Игровое поле
-    var plain = {
-        gameContainer: null,
-        options: null,
-        init: function ($gameContainer, options) {
-            // Общий контейнер
-            this.gameContainer = $gameContainer;
-
-            // Проверим и присвоим опций
-            this.options = options || optionsDefault;
-
-            // Построим начальное игровое поле
-            this.create();
-        },
-        // Построим начальное игровое поле
+    var scene = {
         create: function () {
-            var rowNumber = this.options.plain.row;
-            var colNumber = this.options.plain.col;
-            var process = 'Загрузка. <span class="action">Строим Игровое поле.</span>';
+            // Создадим игровое поле ввиде матрицы, заполнив его 0
+            this.set(plain);
+
+            // Добавим траву
+            this.set(grass);
+
+            // Добавим коров
+            this.set(cows);
+
+            // Добавим тигров
+            this.set(tigers);
+        },
+        set: function (_this) {
+            _this.create();
+        },
+        render: function () {
             var plain = '';
 
-
             // Построим игровое поле
-            for (var row=0; row < rowNumber; row++){
+            for (var row=0; row < _options.plain.row; row++){
 
-                plain += "<div class='row row" + row + "'>";
+                plain += "<div class='row'>";
 
-                for (var col=0; col < colNumber; col++) {
+                for (var col=0; col < _options.plain.col; col++) {
 
-                    tools.showLoading(col, colNumber, this.gameContainer, process);
+                    var objHtmlContent = this.getObjHtmlContent(locationData[row][col]);
 
-                    plain += "<div class='cell cell" + row + "_" + col + " null'><span class='positionCell'>[" + row + " " + col + "]</span></div>"
+                    plain += "<div class='cell'> " + objHtmlContent +"</div>";
+
                 }
 
                 plain += "</div>";
                 plain += "<div class='clear'></div>";
             }
 
-            this.gameContainer.find(".plain").append(plain);
+            $(gameContainer).find(".plain").html(plain);
         },
-        update: function () {
-
+        getObjHtmlContent: function (value) {
+            var objContent = '';
+            switch (parseInt(value)) {
+                case 0:
+                    objContent = plain.show();
+                    break;
+                case 1:
+                    objContent = cows.show();
+                    break;
+                case 2:
+                    objContent = tigers.show();
+                    break;
+                case 3:
+                    objContent = grass.show();
+                    break;
+            }
+            return objContent;
         }
-    };
+    }
+
+    //начальное игровое поле ввиде матрицы
+    var plain = {
+        // Построим начальное игровое поле ввиде матрицы
+        create: function () {
+            // Построим игровое поле ввиде матрицы
+            for (var row=0; row < _options.plain.row; row++){
+                // Добавим новую строку
+                locationData[row] = [];
+                for (var col=0; col < _options.plain.col; col++) {
+                    // наполним новую строку ячейками с значением 0, т.е пусто
+                    locationData[row][col] = 0;
+                }
+            }
+        },
+        show: function () {
+            return "<div class='null'></div>";
+        }
+    }
 
     // Трава
     var grass = {
-        gameContainer: null,
-        options: null,
-        init: function ($gameContainer, options) {
-            // Общий контейнер
-            this.gameContainer = $gameContainer;
-
-            // Проверим и присвоим опций
-            this.options = options || optionsDefault;
-
-            // Раставим траву на поле
-            this.create();
-        },
-        // Раставим траву на поле
+        // Раставим коров на поле
         create: function () {
-            var process = 'Загрузка. <span class="action">Расставляем травку.</span>';
 
-            var rowNumber = this.options.plain.row;
-            var cellNumber = this.options.plain.col;
+            // Построим игровое поле ввиде матрицы
+            for (var row = 0; row < _options.plain.row; row++) {
 
-            // Получим произвольное число в рамках сетки, для расставления травы
-            var countGrass = tools.randomInteger( ((rowNumber + cellNumber) / 2), (rowNumber + cellNumber) - 1 ) ;
+                // Получим количевство травы которую нужно посадить
+                var countGrass = this.getCount();
 
-            for (var i = 0; i < countGrass; i++) {
-                // Получим рандом значение позиции ячейки
-                var cellPosition = this.getRandomCellPosition();
+                for (var col = 0; col < _options.plain.col; col++) {
 
-                // Получим ячейку
-                var $cell = this.gameContainer.find('.cell'+ cellPosition.grassRow +'_' + cellPosition.grassColumn);
+                    // Усложним
+                    var addObj = (Math.random() > 0.5) ? 1 : 0;
 
-                if ($cell.hasClass('null') || !$cell.hasClass('grass')) {
-
-                    tools.showLoading(i, countGrass, this.gameContainer, process);
-
-                    $cell.removeClass('null');
-                    $cell.addClass('grass');
-                    $cell.append('<div class="grass"></div>');
+                    if (countGrass > 0) {
+                        locationData[row][col] = addObj || 3;
+                        countGrass--;
+                    }
                 }
             }
-
         },
-        // Вернем рандом значение позиции ячейки
-        getRandomCellPosition: function () {
-            return {
-                // Сгенерируем номер строки
-                grassRow: tools.randomInteger(0, this.options.plain.row),
-                // Сгенерируем номер ячейки
-                grassColumn: tools.randomInteger(0, this.options.plain.col)
-            };
+        // Получим произвольное число в рамках сетки, для расставления травы
+        getCount: function () {
+            return tools.randomInteger( 0, (_options.plain.row + _options.plain.col) / 1.5 ) ;
+        },
+        show: function () {
+            return "<div class='grass'></div>";
         }
     };
 
     // Коровы
     var cows = {
-        gameContainer: null,
-        options: null,
-        init: function ($gameContainer, options) {
-            // Общий контейнер
-            this.gameContainer = $gameContainer;
-
-            // Проверим и присвоим опций
-            this.options = options || optionsDefault;
-
-            // Раставим траву на поле
-            this.create();
-        },
         // Раставим траву на поле
         create: function () {
-            var process = 'Загрузка. <span class="action">Расставляем коров.</span>';
 
-            var rowNumber = this.options.plain.row;
-            var cellNumber = this.options.plain.col;
+            // Построим игровое поле ввиде матрицы
+            for (var row = 0; row < _options.plain.row; row++) {
 
-            // Получим произвольное число в рамках сетки, для расставления коров
-            var countCows = tools.randomInteger( 1, (rowNumber + cellNumber) / 3 ) ;
+                // Получим количевство травы которую нужно посадить
+                var countCows = this.getCount();
 
-            for (var i = 0; i < countCows; i++) {
-                // Получим рандом значение позиции ячейки
-                var cellPosition = this.getRandomCellPosition();
+                for (var col = 0; col < _options.plain.col; col++) {
 
-                // Получим ячейку
-                var $cell = this.gameContainer.find('.cell'+ cellPosition.cowRow +'_' + cellPosition.cowColumn);
+                    // Усложним
+                    var addObj = (Math.random() > 0.5) ? 1 : 0;
 
-                if ($cell.hasClass('null') || !$cell.hasClass('cow')) {
+                    if (countCows > 0) {
 
-                    tools.showLoading(i, countCows, this.gameContainer, process);
-
-                    this.gameContainer.find(".process").html(process);
-
-                    $cell.removeClass('null');
-                    $cell.addClass('cow');
-                    $cell.append('<div class="cow"></div>');
+                        if (locationData[row][col] != 3 ) {
+                            locationData[row][col] = addObj || 1;
+                            countCows--;
+                        }
+                    }
                 }
             }
-
         },
-        // Вернем рандом значение позиции ячейки
-        getRandomCellPosition: function () {
-            return {
-                // Сгенерируем номер строки
-                cowRow: tools.randomInteger(1, this.options.plain.row),
-                // Сгенерируем номер ячейки
-                cowColumn: tools.randomInteger(1, this.options.plain.col)
-            };
+        // Получим произвольное число в рамках сетки, для расставления травы
+        getCount: function () {
+            return tools.randomInteger( _options.cows.min, _options.cows.max ) ;
+        },
+        show: function () {
+            return "<div class='cow'></div>";
         }
     };
 
     // Тигры
-    var tigers= {
-        gameContainer: null,
-        options: null,
-        init: function ($gameContainer, options) {
-            // Общий контейнер
-            this.gameContainer = $gameContainer;
-
-            // Проверим и присвоим опций
-            this.options = options || optionsDefault;
-
-            // Раставим траву на поле
-            this.create();
-        },
-        // Раставим тигров на поле
+    var tigers = {
+        // Раставим траву на поле
         create: function () {
-            var process = 'Загрузка. <span class="action">Расставляем тигров.</span>';
 
-            var rowNumber = this.options.plain.row;
-            var cellNumber = this.options.plain.col;
+            // Построим игровое поле ввиде матрицы
+            for (var row = 0; row < _options.plain.row; row++) {
 
-            // Получим произвольное число в рамках сетки, для расставления коров
-            var countTigers = tools.randomInteger( 1, (rowNumber + cellNumber) / 3 ) ;
+                // Получим количевство травы которую нужно посадить
+                var countTigers = this.getCount();
 
-            for (var i = 0; i < countTigers; i++) {
-                // Получим рандом значение позиции ячейки
-                var cellPosition = this.getRandomCellPosition();
+                for (var col = 0; col < _options.plain.col; col++) {
 
-                // Получим ячейку
-                var $cell = this.gameContainer.find('.cell'+ cellPosition.tigerRow +'_' + cellPosition.tigerColumn);
+                    // Усложним
+                    var addObj = (Math.random() > 0.5) ? 1 : 0;
 
-                if (!$cell.hasClass('cow') && !$cell.hasClass('tiger')) {
+                    if (countTigers > 0) {
 
-                    tools.showLoading(i, countTigers, this.gameContainer, process);
-
-                    this.gameContainer.find(".process").html(process);
-
-                    $cell.removeClass('null');
-                    $cell.addClass('tiger');
-                    $cell.append('<div class="tiger"></div>');
+                        if (locationData[row][col] != 3 || locationData[row][col] != 1 ) {
+                            locationData[row][col] = addObj || 2;
+                            countTigers--;
+                        }
+                    }
                 }
             }
-
         },
-        // Вернем рандом значение позиции ячейки
-        getRandomCellPosition: function () {
-            return {
-                // Сгенерируем номер строки
-                tigerRow: tools.randomInteger(1, this.options.plain.row),
-                // Сгенерируем номер ячейки
-                tigerColumn: tools.randomInteger(1, this.options.plain.col)
-            };
-        }
-    };
-
-    // Еда
-    var foods = {
-        gameContainer: null,
-        options: null,
-        init: function ($gameContainer, options) {
-            // Общий контейнер
-            this.gameContainer = $gameContainer;
-
-            // Проверим и присвоим опций
-            this.options = options || optionsDefault;
-
-            // Раставим траву на поле
-            this.create();
+        // Получим произвольное число в рамках сетки, для расставления травы
+        getCount: function () {
+            return tools.randomInteger( _options.tigers.min, _options.tigers.max ) ;
         },
-        // Раставим тигров на поле
-        create: function () {
-            var process = 'Загрузка. <span class="action">Расставляем Еду.</span>';
-
-            var rowNumber = this.options.plain.row;
-            var cellNumber = this.options.plain.col;
-
-            // Получим произвольное число в рамках сетки, для расставления коров
-            var countFoods = tools.randomInteger( 1, (rowNumber + cellNumber) / 3 ) ;
-
-            for (var i = 0; i < countFoods; i++) {
-                // Получим рандом значение позиции ячейки
-                var cellPosition = this.getRandomCellPosition();
-
-                // Получим ячейку
-                var $cell = this.gameContainer.find('.cell'+ cellPosition.foodRow +'_' + cellPosition.foodColumn);
-
-                if (!$cell.hasClass('cow') && !$cell.hasClass('tiger') && !$cell.hasClass('food')) {
-
-                    tools.showLoading(i, countFoods, this.gameContainer, process);
-
-                    this.gameContainer.find(".process").html(process);
-
-                    $cell.removeClass('null');
-                    $cell.addClass('food');
-                    $cell.append('<div class="food"></div>');
-                }
-            }
-
-        },
-        // Вернем рандом значение позиции ячейки
-        getRandomCellPosition: function () {
-            return {
-                // Сгенерируем номер строки
-                foodRow: tools.randomInteger(1, this.options.plain.row),
-                // Сгенерируем номер ячейки
-                foodColumn: tools.randomInteger(1, this.options.plain.col)
-            };
+        show: function () {
+            return "<div class='tiger'></div>";
         }
     };
 
     // Вспомогательные функции для игры
     var tools = {
+
         randomInteger: function (min, max) {
             return Math.floor(Math.random() * (max - min)) + min;
-        },
+        }
+        /*
         showLoading: function (startNumber, endNumber, $gameContainer, process) {
             var progress = startNumber * 100 / endNumber;
             var $progressBar = $gameContainer.find('progress');
@@ -397,6 +304,7 @@ var game = (function ($) {
                 $process.hide();
             }
         }
+        */
     };
 
     return {
