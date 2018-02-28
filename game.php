@@ -16,16 +16,16 @@
         $(function () {
             var options = {
                 plain: {
-                    row: 6,
-                    col: 16
+                    row: 8,
+                    col: 8
                 },
                 cows: {
-                    min: 1,
-                    max: 12
+                    min: 0,
+                    max: 4
                 },
                 tigers: {
-                    min: 1,
-                    max: 12
+                    min: 0,
+                    max: 3
                 }
             };
            game.init($('#game'), options);

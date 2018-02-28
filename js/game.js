@@ -58,20 +58,6 @@
 var game = (function ($) {
     // Настройки по умолчанию,
     // Приминяються, когда нет переданных настроек из вне
-    var optionsDefault = {
-        plain: {
-            row: 8,
-            col: 8
-        },
-        cows: {
-            min: 1,
-            max: 8
-        },
-        tigers: {
-            min: 1,
-            max: 10
-        }
-    };
 
     var gameContainer = null;
     var _options = null;
@@ -84,10 +70,10 @@ var game = (function ($) {
             // Общий контейнер
             gameContainer = $gameContainer;
             // Проверим и присвоим опций
-            _options = options || optionsDefault;
+            _options = options;
 
             // создадим сцену ввиде массива и проставим в нем цифры
-            scene.create();
+            scene.build();
 
             // Запуск игры
             this.run();
@@ -102,35 +88,32 @@ var game = (function ($) {
     };
 
     var scene = {
-        create: function () {
+        build: function () {
             // Создадим игровое поле ввиде матрицы, заполнив его 0
-            this.set(plain);
+            plain.generate();
 
             // Добавим траву
-            this.set(grass);
+            grass.generate();
 
             // Добавим коров
-            this.set(cows);
+            cows.generate();
 
             // Добавим тигров
-            this.set(tigers);
-        },
-        set: function (_this) {
-            _this.create();
+            tigers.generate();
         },
         render: function () {
             var plain = '';
 
             // Построим игровое поле
-            for (var row=0; row < _options.plain.row; row++){
+            for (var row = 0; row < _options.plain.row; row++) {
 
                 plain += "<div class='row'>";
 
-                for (var col=0; col < _options.plain.col; col++) {
+                for (var col = 0; col < _options.plain.col; col++) {
 
                     var objHtmlContent = this.getObjHtmlContent(locationData[row][col]);
 
-                    plain += "<div class='cell'> " + objHtmlContent +"</div>";
+                    plain += "<div class='cell'> " + objHtmlContent + "</div>";
 
                 }
 
@@ -163,12 +146,12 @@ var game = (function ($) {
     //начальное игровое поле ввиде матрицы
     var plain = {
         // Построим начальное игровое поле ввиде матрицы
-        create: function () {
+        generate: function () {
             // Построим игровое поле ввиде матрицы
-            for (var row=0; row < _options.plain.row; row++){
+            for (var row = 0; row < _options.plain.row; row++) {
                 // Добавим новую строку
                 locationData[row] = [];
-                for (var col=0; col < _options.plain.col; col++) {
+                for (var col = 0; col < _options.plain.col; col++) {
                     // наполним новую строку ячейками с значением 0, т.е пусто
                     locationData[row][col] = 0;
                 }
@@ -182,7 +165,7 @@ var game = (function ($) {
     // Трава
     var grass = {
         // Раставим коров на поле
-        create: function () {
+        generate: function () {
 
             // Построим игровое поле ввиде матрицы
             for (var row = 0; row < _options.plain.row; row++) {
@@ -204,7 +187,7 @@ var game = (function ($) {
         },
         // Получим произвольное число в рамках сетки, для расставления травы
         getCount: function () {
-            return tools.randomInteger( 0, (_options.plain.row + _options.plain.col) / 1.5 ) ;
+            return tools.randomInteger(1, (_options.plain.row + _options.plain.col) / 1.5);
         },
         show: function () {
             return "<div class='grass'></div>";
@@ -214,22 +197,22 @@ var game = (function ($) {
     // Коровы
     var cows = {
         // Раставим траву на поле
-        create: function () {
+        generate: function () {
+
+            // Получим количевство коров которых нужно расставить
+            var countCows = this.getCount();
 
             // Построим игровое поле ввиде матрицы
             for (var row = 0; row < _options.plain.row; row++) {
 
-                // Получим количевство травы которую нужно посадить
-                var countCows = this.getCount();
+                // Усложним
+                var addObj = (Math.random() > 0.5) ? 1 : 0;
 
                 for (var col = 0; col < _options.plain.col; col++) {
 
-                    // Усложним
-                    var addObj = (Math.random() > 0.5) ? 1 : 0;
+                    if (locationData[row][col] != 3) {
 
-                    if (countCows > 0) {
-
-                        if (locationData[row][col] != 3 ) {
+                        if (countCows > 0) {
                             locationData[row][col] = addObj || 1;
                             countCows--;
                         }
@@ -239,7 +222,7 @@ var game = (function ($) {
         },
         // Получим произвольное число в рамках сетки, для расставления травы
         getCount: function () {
-            return tools.randomInteger( _options.cows.min, _options.cows.max ) ;
+            return tools.randomInteger(_options.cows.min, _options.cows.max);
         },
         show: function () {
             return "<div class='cow'></div>";
@@ -249,22 +232,21 @@ var game = (function ($) {
     // Тигры
     var tigers = {
         // Раставим траву на поле
-        create: function () {
-
+        generate: function () {
+            
             // Построим игровое поле ввиде матрицы
             for (var row = 0; row < _options.plain.row; row++) {
 
-                // Получим количевство травы которую нужно посадить
+                // Получим количевство тигров которых нужно раставить
                 var countTigers = this.getCount();
+                // Усложним
+                var addObj = (Math.random() > 0.5) ? 1 : 0;
 
                 for (var col = 0; col < _options.plain.col; col++) {
 
-                    // Усложним
-                    var addObj = (Math.random() > 0.5) ? 1 : 0;
+                    if (locationData[row][col] != 3 || locationData[row][col] != 1) {
 
-                    if (countTigers > 0) {
-
-                        if (locationData[row][col] != 3 || locationData[row][col] != 1 ) {
+                        if (countTigers > 0) {
                             locationData[row][col] = addObj || 2;
                             countTigers--;
                         }
@@ -274,7 +256,7 @@ var game = (function ($) {
         },
         // Получим произвольное число в рамках сетки, для расставления травы
         getCount: function () {
-            return tools.randomInteger( _options.tigers.min, _options.tigers.max ) ;
+            return tools.randomInteger(_options.tigers.min, _options.tigers.max);
         },
         show: function () {
             return "<div class='tiger'></div>";
