@@ -1,0 +1,78 @@
+html {
+    background: #333333;
+}
+#game {
+    display: block;
+    position: relative;
+    margin: 10px;
+}
+#game .row {
+    display: block;
+    position: relative;
+}
+
+#game .cell {
+    display: block;
+    position: relative;
+    float: left;
+    border: 1px solid #333;
+    padding: 10px;
+    width: 60px;
+    height: 60px;
+    color: #fffb00;
+    font: bold 14px Tahoma, Arial, sans-serif;
+    text-align: right;
+}
+
+#game .cell .positionCell {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: rgba(0, 0, 0, 0.53);
+    padding: 3px 4px;
+    -webkit-border-radius: 0px 0px 0px 6px;
+    -moz-border-radius: 0px 0px 0px 6px;
+    border-radius: 0px 0px 0px 6px;
+    z-index: 100;
+}
+#game .cell.null {
+    background: #828282;
+}
+
+#game .cell .cow,
+#game .cell .tiger,
+#game .cell .grass,
+#game .cell .food {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+}
+
+#game .cell .cow {
+    background: url('../img/cow.png')center;
+    background-size: cover;
+}
+#game .cell .tiger {
+    background: url('../img/tiger.png')center;
+    background-size: cover;
+}
+#game .cell .grass {
+    background: url('../img/grass.jpeg')center;
+    background-size: cover;
+}
+#game .cell .food {
+    background: url('../img/burger.png')center;
+    background-size: cover;
+}
+#game .cell.death {
+    background: url('../img/rip.png')center;
+    background-size: cover;
+}
+
+
+#game .clear {
+    clear: both;
+}
