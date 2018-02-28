@@ -93,6 +93,12 @@ var game = (function ($) {
             // Раставим коров
             cows.init($gameContainer, this.options);
 
+            // Раставим тигров
+            tigers.init($gameContainer, this.options);
+
+            // Раставим еду
+            foods.init($gameContainer, this.options);
+
             // Запуск игры
             this.run();
         },
@@ -256,6 +262,116 @@ var game = (function ($) {
                 cowRow: tools.randomInteger(1, this.options.plain.row),
                 // Сгенерируем номер ячейки
                 cowColumn: tools.randomInteger(1, this.options.plain.col)
+            };
+        }
+    };
+
+    // Тигры
+    var tigers= {
+        gameContainer: null,
+        options: null,
+        init: function ($gameContainer, options) {
+            // Общий контейнер
+            this.gameContainer = $gameContainer;
+
+            // Проверим и присвоим опций
+            this.options = options || optionsDefault;
+
+            // Раставим траву на поле
+            this.create();
+        },
+        // Раставим тигров на поле
+        create: function () {
+            var process = 'Загрузка. <span class="action">Расставляем тигров.</span>';
+
+            var rowNumber = this.options.plain.row;
+            var cellNumber = this.options.plain.col;
+
+            // Получим произвольное число в рамках сетки, для расставления коров
+            var countTigers = tools.randomInteger( 1, (rowNumber + cellNumber) / 3 ) ;
+
+            for (var i = 0; i < countTigers; i++) {
+                // Получим рандом значение позиции ячейки
+                var cellPosition = this.getRandomCellPosition();
+
+                // Получим ячейку
+                var $cell = this.gameContainer.find('.cell'+ cellPosition.tigerRow +'_' + cellPosition.tigerColumn);
+
+                if (!$cell.hasClass('cow') && !$cell.hasClass('tiger')) {
+
+                    tools.showLoading(i, countTigers, this.gameContainer, process);
+
+                    this.gameContainer.find(".process").html(process);
+
+                    $cell.removeClass('null');
+                    $cell.addClass('tiger');
+                    $cell.append('<div class="tiger"></div>');
+                }
+            }
+
+        },
+        // Вернем рандом значение позиции ячейки
+        getRandomCellPosition: function () {
+            return {
+                // Сгенерируем номер строки
+                tigerRow: tools.randomInteger(1, this.options.plain.row),
+                // Сгенерируем номер ячейки
+                tigerColumn: tools.randomInteger(1, this.options.plain.col)
+            };
+        }
+    };
+
+    // Еда
+    var foods = {
+        gameContainer: null,
+        options: null,
+        init: function ($gameContainer, options) {
+            // Общий контейнер
+            this.gameContainer = $gameContainer;
+
+            // Проверим и присвоим опций
+            this.options = options || optionsDefault;
+
+            // Раставим траву на поле
+            this.create();
+        },
+        // Раставим тигров на поле
+        create: function () {
+            var process = 'Загрузка. <span class="action">Расставляем Еду.</span>';
+
+            var rowNumber = this.options.plain.row;
+            var cellNumber = this.options.plain.col;
+
+            // Получим произвольное число в рамках сетки, для расставления коров
+            var countFoods = tools.randomInteger( 1, (rowNumber + cellNumber) / 3 ) ;
+
+            for (var i = 0; i < countFoods; i++) {
+                // Получим рандом значение позиции ячейки
+                var cellPosition = this.getRandomCellPosition();
+
+                // Получим ячейку
+                var $cell = this.gameContainer.find('.cell'+ cellPosition.foodRow +'_' + cellPosition.foodColumn);
+
+                if (!$cell.hasClass('cow') && !$cell.hasClass('tiger') && !$cell.hasClass('food')) {
+
+                    tools.showLoading(i, countFoods, this.gameContainer, process);
+
+                    this.gameContainer.find(".process").html(process);
+
+                    $cell.removeClass('null');
+                    $cell.addClass('food');
+                    $cell.append('<div class="food"></div>');
+                }
+            }
+
+        },
+        // Вернем рандом значение позиции ячейки
+        getRandomCellPosition: function () {
+            return {
+                // Сгенерируем номер строки
+                foodRow: tools.randomInteger(1, this.options.plain.row),
+                // Сгенерируем номер ячейки
+                foodColumn: tools.randomInteger(1, this.options.plain.col)
             };
         }
     };
