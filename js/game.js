@@ -82,6 +82,8 @@ var game = (function ($) {
 
             // Главный Loop
             setInterval(function () {
+                //Для отладки
+            // setTimeout(function () {
                 scene.render();
             }, 1000);
         }
@@ -102,44 +104,39 @@ var game = (function ($) {
             tigers.generate();
         },
         render: function () {
-            var plain = '';
+            var map = '';
 
             // Построим игровое поле
             for (var row = 0; row < _options.plain.row; row++) {
 
-                plain += "<div class='row'>";
+                map += "<div class='row'>";
 
                 for (var col = 0; col < _options.plain.col; col++) {
 
-                    var objHtmlContent = this.getObjHtmlContent(locationData[row][col]);
-
-                    plain += "<div class='cell'> " + objHtmlContent + "</div>";
+                    map += "<div class='cell'> " + this.getObj(locationData[row][col]).show() + "</div>";
 
                 }
 
-                plain += "</div>";
-                plain += "<div class='clear'></div>";
+                map += "</div>";
             }
 
-            $(gameContainer).find(".plain").html(plain);
+            $(gameContainer).find(".plain").html(map);
         },
-        getObjHtmlContent: function (value) {
-            var objContent = '';
+        getObj: function (value) {
             switch (parseInt(value)) {
                 case 0:
-                    objContent = plain.show();
+                    return plain;
                     break;
                 case 1:
-                    objContent = cows.show();
+                    return cows;
                     break;
                 case 2:
-                    objContent = tigers.show();
+                    return tigers;
                     break;
                 case 3:
-                    objContent = grass.show();
+                    return grass;
                     break;
             }
-            return objContent;
         }
     }
 
@@ -187,6 +184,7 @@ var game = (function ($) {
         },
         // Получим произвольное число в рамках сетки, для расставления травы
         getCount: function () {
+
             return tools.randomInteger(1, (_options.plain.row + _options.plain.col) / 1.5);
         },
         show: function () {

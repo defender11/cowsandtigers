@@ -6,6 +6,11 @@ html {
     position: relative;
     margin: 10px;
 }
+#game .plain {
+    display: flex;
+    flex-flow:row wrap;
+    justify-content: flex-start;
+}
 #game .row {
     display: block;
     position: relative;
@@ -14,7 +19,7 @@ html {
 #game .cell {
     display: block;
     position: relative;
-    float: left;
+    background: #452b14;
     border: 1px solid #000;
     padding: 10px;
     width: 60px;
@@ -35,10 +40,9 @@ html {
     border-radius: 0px 0px 0px 6px;
     z-index: 100;
 }
-#game .cell.null {
-    background: #828282;
-}
 
+#game .cell .null,
+#game .cell .death,
 #game .cell .cow,
 #game .cell .tiger,
 #game .cell .grass,
@@ -51,6 +55,10 @@ html {
     left: 0;
 }
 
+#game .cell .null {
+    background: url('../img/ground.jpeg')center;
+    background-size: cover;
+}
 #game .cell .cow {
     background: url('../img/cow.png')center;
     background-size: cover;
@@ -67,12 +75,7 @@ html {
     background: url('../img/burger.png')center;
     background-size: cover;
 }
-#game .cell.death {
+#game .cell .death {
     background: url('../img/rip.png')center;
     background-size: cover;
-}
-
-
-#game .clear {
-    clear: both;
 }

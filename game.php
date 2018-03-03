@@ -16,8 +16,8 @@
         $(function () {
             var options = {
                 plain: {
-                    row: 8,
-                    col: 8
+                    row: 6,
+                    col: 6
                 },
                 cows: {
                     min: 0,
