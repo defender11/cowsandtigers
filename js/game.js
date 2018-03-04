@@ -56,9 +56,6 @@
 * */
 
 var game = (function ($) {
-    // Настройки по умолчанию,
-    // Приминяються, когда нет переданных настроек из вне
-
     var gameContainer = null;
     var setting = null;
 
