@@ -26,7 +26,8 @@
                 tigers: {
                     min: 0,
                     max: 3
-                }
+                },
+                devMode: true
             };
            game.init($('#game'), options);
         });
