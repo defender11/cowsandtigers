@@ -56,10 +56,13 @@
 * */
 
 var game = (function ($) {
-    var gameContainer = null;
-    var setting = null;
+    // Настройки по умолчанию,
+    // Приминяються, когда нет переданных настроек из вне
 
-    var mapData = [];
+    var gameContainer = null;
+    var _options = null;
+
+    var locationData = [];
 
     // Ядро игры
     var game = {
@@ -67,25 +70,22 @@ var game = (function ($) {
             // Общий контейнер
             gameContainer = $gameContainer;
             // Проверим и присвоим опций
-            setting = options;
+            _options = options;
 
             // создадим сцену ввиде массива и проставим в нем цифры
-            scene.build(options);
+            scene.build();
 
             // Запуск игры
             this.run();
         },
         run: function () {
 
-
-            if (!setting.devMode) {
-                // Главный Loop
-                setInterval(function () {
-                    scene.render();
-                }, 1000);
-            } else {
+            // Главный Loop
+            setInterval(function () {
+                //Для отладки
+            // setTimeout(function () {
                 scene.render();
-            }
+            }, 1000);
         }
     };
 
@@ -107,13 +107,13 @@ var game = (function ($) {
             var map = '';
 
             // Построим игровое поле
-            for (var row = 0; row < setting.plain.row; row++) {
+            for (var row = 0; row < _options.plain.row; row++) {
 
                 map += "<div class='row'>";
 
-                for (var col = 0; col < setting.plain.col; col++) {
+                for (var col = 0; col < _options.plain.col; col++) {
 
-                    map += "<div class='cell'> " + this.getObj(mapData[row][col]).show() + "</div>";
+                    map += "<div class='cell'> " + this.getObj(locationData[row][col]).show() + "</div>";
 
                 }
 
@@ -138,26 +138,26 @@ var game = (function ($) {
                     break;
             }
         }
-    };
+    }
 
     //начальное игровое поле ввиде матрицы
     var plain = {
         // Построим начальное игровое поле ввиде матрицы
         generate: function () {
             // Построим игровое поле ввиде матрицы
-            for (var row = 0; row < setting.plain.row; row++) {
+            for (var row = 0; row < _options.plain.row; row++) {
                 // Добавим новую строку
-                mapData[row] = [];
-                for (var col = 0; col < setting.plain.col; col++) {
+                locationData[row] = [];
+                for (var col = 0; col < _options.plain.col; col++) {
                     // наполним новую строку ячейками с значением 0, т.е пусто
-                    mapData[row][col] = 0;
+                    locationData[row][col] = 0;
                 }
             }
         },
         show: function () {
             return "<div class='null'></div>";
         }
-    };
+    }
 
     // Трава
     var grass = {
@@ -165,18 +165,18 @@ var game = (function ($) {
         generate: function () {
 
             // Построим игровое поле ввиде матрицы
-            for (var row = 0; row < setting.plain.row; row++) {
+            for (var row = 0; row < _options.plain.row; row++) {
 
                 // Получим количевство травы которую нужно посадить
                 var countGrass = this.getCount();
 
-                for (var col = 0; col < setting.plain.col; col++) {
+                for (var col = 0; col < _options.plain.col; col++) {
 
                     // Усложним
                     var addObj = (Math.random() > 0.5) ? 1 : 0;
 
                     if (countGrass > 0) {
-                        mapData[row][col] = addObj || 3;
+                        locationData[row][col] = addObj || 3;
                         countGrass--;
                     }
                 }
@@ -185,7 +185,7 @@ var game = (function ($) {
         // Получим произвольное число в рамках сетки, для расставления травы
         getCount: function () {
 
-            return tools.randomInteger(1, (setting.plain.row + setting.plain.col) / 1.5);
+            return tools.randomInteger(1, (_options.plain.row + _options.plain.col) / 1.5);
         },
         show: function () {
             return "<div class='grass'></div>";
@@ -201,17 +201,17 @@ var game = (function ($) {
             var countCows = this.getCount();
 
             // Построим игровое поле ввиде матрицы
-            for (var row = 0; row < setting.plain.row; row++) {
+            for (var row = 0; row < _options.plain.row; row++) {
 
                 // Усложним
                 var addObj = (Math.random() > 0.5) ? 1 : 0;
 
-                for (var col = 0; col < setting.plain.col; col++) {
+                for (var col = 0; col < _options.plain.col; col++) {
 
-                    if (mapData[row][col] != 3) {
+                    if (locationData[row][col] != 3) {
 
                         if (countCows > 0) {
-                            mapData[row][col] = addObj || 1;
+                            locationData[row][col] = addObj || 1;
                             countCows--;
                         }
                     }
@@ -220,7 +220,7 @@ var game = (function ($) {
         },
         // Получим произвольное число в рамках сетки, для расставления травы
         getCount: function () {
-            return tools.randomInteger(setting.cows.min, setting.cows.max);
+            return tools.randomInteger(_options.cows.min, _options.cows.max);
         },
         show: function () {
             return "<div class='cow'></div>";
@@ -231,21 +231,21 @@ var game = (function ($) {
     var tigers = {
         // Раставим траву на поле
         generate: function () {
-
+            
             // Построим игровое поле ввиде матрицы
-            for (var row = 0; row < setting.plain.row; row++) {
+            for (var row = 0; row < _options.plain.row; row++) {
 
                 // Получим количевство тигров которых нужно раставить
                 var countTigers = this.getCount();
                 // Усложним
                 var addObj = (Math.random() > 0.5) ? 1 : 0;
 
-                for (var col = 0; col < setting.plain.col; col++) {
+                for (var col = 0; col < _options.plain.col; col++) {
 
-                    if (mapData[row][col] != 3 || mapData[row][col] != 1) {
+                    if (locationData[row][col] != 3 || locationData[row][col] != 1) {
 
                         if (countTigers > 0) {
-                            mapData[row][col] = addObj || 2;
+                            locationData[row][col] = addObj || 2;
                             countTigers--;
                         }
                     }
@@ -254,7 +254,7 @@ var game = (function ($) {
         },
         // Получим произвольное число в рамках сетки, для расставления травы
         getCount: function () {
-            return tools.randomInteger(setting.tigers.min, setting.tigers.max);
+            return tools.randomInteger(_options.tigers.min, _options.tigers.max);
         },
         show: function () {
             return "<div class='tiger'></div>";
