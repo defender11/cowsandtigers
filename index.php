@@ -14,22 +14,26 @@
     <script src="js/game.js"></script>
     <script>
         $(function () {
-            var options = {
-                plain: {
+            var setting = {
+                map: {
                     row: 6,
                     col: 6
                 },
+                grass: {
+                    min: 2,
+                    max: 10
+                },
                 cows: {
-                    min: 0,
-                    max: 4
+                    min: 3,
+                    max: 6
                 },
                 tigers: {
-                    min: 0,
-                    max: 3
+                    min: 2,
+                    max: 4
                 },
                 devMode: true
             };
-           game.init($('#game'), options);
+           game.init($('#game'), setting);
         });
     </script>
 </head>
