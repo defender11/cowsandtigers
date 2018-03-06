@@ -89,42 +89,40 @@ var game = (function ($) {
             if (!this.devMode) {
                 // Главный Loop
                 setInterval(function () {
+                    scene.event(map);
                     scene.render(map);
                 }, this.timeRender);
             } else {
+                scene.event(map);
                 scene.render(map);
             }
         }
     };
 
     var scene = {
+        elements: [],
         gameContainer: null,
         build: function (setting) {
             map.init(setting);
 
-            // Добавим траву
-            map.generate(grass);
-            // Добавим коров
-            map.generate(cows);
-            // Добавим тигров
-            map.generate(tigers);
-            // Добавим землю
-            map.generate(ground);
+            // Добавим объекты в массив
+            this.elements.push(ground,cows,tigers,grass);
 
-            console.log(map.mapData);
+            // Добавим траву
+            map.generate(this.elements[3]);
+            // Добавим коров
+            map.generate(this.elements[1]);
+            // Добавим тигров
+            map.generate(this.elements[2]);
+            // Добавим землю
+            map.generate(this.elements[0]);
+
         },
         getObj: function (map, row, col) {
             var value = map.mapData[row][col];
 
-            // Костыль, очень редко выплывает одна ячейка не заполнена
-            // if (!value) {
-            //     return ground;
-            // }
-            var unit = [ground, cows, tigers, grass];
-
-            // if (unit.indexOf(+value) != -1) {
-            if (unit[+value] != undefined) {
-                return unit[+value];
+            if (value > 0) {
+                return this.elements[value];
             } else {
                 return ground;
             }
@@ -148,6 +146,12 @@ var game = (function ($) {
             }
 
             $(this.gameContainer).find(".plain").html(mapHTML);
+        },
+        event: function (map) {
+            // для каждого объекта вызовим его метод action с своим поведением
+            for (var i=0; i < this.elements.length; i++) {
+                this.elements[i].action(map);
+            }
         }
     };
 
@@ -175,23 +179,13 @@ var game = (function ($) {
                 var mapRowCol = this.getRandomRowColCoord();
 
                 // console.log('mapRowColNormal: ', mapRowCol);
-                //
-                // do {
-                //
-                //     var isCoordAdd = false;
-                //
-                //     // создадим координаты для проставления
-                //     var mapRowCol = this.getRandomRowColCoord();
-                //
-                //     if (this.mapData[mapRowCol.row][mapRowCol.col] == undefined) {
-                //         this.mapData[mapRowCol.row][mapRowCol.col] = obj.id;
-                //         isCoordAdd = true;
-                //     }
-                //
-                // } while(isCoordAdd);
 
                 if (this.mapData[mapRowCol.row][mapRowCol.col] == undefined) {
                     this.mapData[mapRowCol.row][mapRowCol.col] = obj.id;
+
+                    // Сохраним координаты добавленного элемента на карте
+                    obj.saveCoordinate(mapRowCol.row,mapRowCol.col);
+
                 } else {
                     this.tryNewGenerate(obj, objCountOnMap);
                 }
@@ -211,6 +205,9 @@ var game = (function ($) {
 
                 if (this.mapData[mapRowCol.row][mapRowCol.col] == undefined) {
                     this.mapData[mapRowCol.row][mapRowCol.col] = obj.id;
+
+                    // Сохраним координаты добавленного элемента на карте
+                    obj.saveCoordinate(mapRowCol.row,mapRowCol.col);
                     return false;
                 } else {
                     return this.tryNewGenerate(obj, count - 1);
@@ -234,12 +231,136 @@ var game = (function ($) {
         }
     }
 
+    // Агоритм движение, сделал прототипом, т.к приминяеться у тигров и коров
+    //
+    function Algorithm () {}
+
+    Algorithm.prototype.init = function (obj, map) {
+
+        // Проверим и вернем координаты хотя бы одной безопасной клетки
+        // return {
+        //  safe: true, false;
+        //  safeCellCoordinates: [{row: 0, cell: 0},{row: 1, cell: 0}];
+        // }
+        var neighborsCellReport = this.isAnyNeighborsCellSafe(obj, map);
+
+        // if (neighborsCellReport.safe) {
+        //     this.move(obj, map, neighborsCellReport.safeCellCoordinates);
+        // }
+    }
+
+    Algorithm.prototype.isAnyNeighborsCellSafe = function (obj, map) {
+
+
+        var elsCoord = [];
+
+        for (var i = 0; i < obj.coordinate.length; i++) {
+
+            // Доделать и проверить, не правильно определяет границы
+            var safeWays = this.doesNotGoBeyondBorders(obj.coordinate[i], map);
+            
+            console.log(safeWays);
+        }
+
+        // for (var row = 0; row < map.row; row++) {
+        //     for (var col = 0; col < map.col; col++) {
+        //         if (map.mapData[row][col] == obj.id) {
+        //             elsCoord.push({
+        //                 row: row,
+        //                 col: col
+        //             });
+        //         }
+        //     }
+        // }
+        // return elsCoord;
+    }
+
+    // Проверим не зашли ли за границы
+    Algorithm.prototype.doesNotGoBeyondBorders = function (elementCoord, map) {
+        // Не забыть про границы карты
+        var leftTopAngle = 0,
+            left = 0,
+            right = map.cell,
+            top = 0,
+            bottom = map.row,
+            rightTopAngle = map.cell,
+            leftBottomAngle = map.row,
+            rightBottomAngle = map.cell;
+
+        var safeAngle = {
+            top: false,
+            topRight: false,
+            right: false,
+            rightBottom: false,
+            bottom: false,
+            leftBottom: false,
+            left: false,
+            leftTop: false
+        };
+
+        // Проверим ячейку с вверху
+        if ((elementCoord.col - 1) >= top) {
+            safeAngle.top = true;
+        }
+        // Проверим ячейку с вверху-вправо
+        if ((elementCoord.row + 1 ) >= top && (elementCoord.col - 1) <= rightTopAngle) {
+            safeAngle.topRight = true;
+        }
+        // Проверим ячейку с вправо
+        if ((elementCoord.row + 1 ) <= rightTopAngle) {
+            safeAngle.right = true;
+        }
+        // Проверим ячейку с вправо-внизу
+        if ((elementCoord.row + 1 ) <= rightTopAngle && (elementCoord.col + 1) <=  rightBottomAngle) {
+            safeAngle.rightBottom = true;
+        }
+        // Проверим ячейку внизу
+        if ((elementCoord.col + 1) <=  bottom) {
+            safeAngle.bottom = true;
+        }
+        // Проверим ячейку с слева-внизу
+        if ((elementCoord.row - 1 ) <= leftBottomAngle && (elementCoord.col + 1) <=  bottom) {
+            safeAngle.leftBottom = true;
+        }
+        // Проверим ячейку с слева
+        if ((elementCoord.row - 1 ) <= left) {
+            safeAngle.left = true;
+        }
+        // Проверим ячейку с лева-вверху
+        if ((elementCoord.row - 1 ) <= left && (elementCoord.col - 1 ) <= top) {
+            safeAngle.leftTop = true;
+        }
+
+        return safeAngle;
+    }
+
+    Algorithm.prototype.findSafeWays = function (obj, map) {
+
+    }
+    Algorithm.prototype.move = function (obj, map, safeCellCoordinates) {
+        console.log("Algorithm work");
+        console.log(obj);
+        console.log(map);
+    }
+
+    var algorithm = new Algorithm();
+
     var ground = {
         id: 0,
-        min: 20,
-        max: 200,
+        min: 1,
+        max: 12,
+        coordinate: [],
         show: function () {
             return "<div class='null'></div>";
+        },
+        action: function (map) {
+            console.log("action groud");
+        },
+        saveCoordinate: function (row,col) {
+            this.coordinate.push({
+                row: row,
+                col: col
+            });
         }
     };
 
@@ -248,8 +369,18 @@ var game = (function ($) {
         id: 3,
         min: 0,
         max: 3,
+        coordinate: [],
         show: function () {
             return "<div class='grass'></div>";
+        },
+        action: function (map) {
+            console.log("action grass");
+        },
+        saveCoordinate: function (row,col) {
+            this.coordinate.push({
+                row: row,
+                col: col
+            });
         }
     };
 
@@ -258,11 +389,18 @@ var game = (function ($) {
         id: 1,
         min: 0,
         max: 3,
+        coordinate: [],
         show: function () {
             return "<div class='cow'></div>";
         },
-        move: function () {
-
+        action: function (map) {
+            algorithm.init(this, map);
+        },
+        saveCoordinate: function (row,col) {
+            this.coordinate.push({
+                row: row,
+                col: col
+            });
         }
     };
 
@@ -271,16 +409,28 @@ var game = (function ($) {
         id: 2,
         min: 0,
         max: 3,
+        coordinate: [],
         show: function () {
             return "<div class='tiger'></div>";
+        },
+        action: function (map) {
+            console.log("action tigers");
+        },
+        saveCoordinate: function (row,col) {
+            this.coordinate.push({
+                row: row,
+                col: col
+            });
         }
     };
 
+    // ???
     var controls = {
-        init: function () {
-            // Персонаж
-            // Карта
-            //
+        cows: function () {
+
+        },
+        tigers: function () {
+
         }
     }
     

@@ -21,7 +21,7 @@
                 },
                 grass: {
                     min: 2,
-                    max: 10
+                    max: 6
                 },
                 cows: {
                     min: 3,
@@ -31,8 +31,8 @@
                     min: 2,
                     max: 4
                 },
-                devMode: false,
-                timeRender: 10
+                devMode: true,
+                timeRender: 1000
             };
            game.init($('#game'), setting);
         });
