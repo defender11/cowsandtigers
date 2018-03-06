@@ -113,25 +113,20 @@ var game = (function ($) {
 
             console.log(map.mapData);
         },
-        getObj: function (value) {
-            // Костыль, очень редко выплывает одна ячейка не заполнена
-            if (value == undefined ) {
-                return ground;
-            }
+        getObj: function (map, row, col) {
+            var value = map.mapData[row][col];
 
-            switch (parseInt(value)) {
-                case 0:
-                    return ground;
-                    break;
-                case 1:
-                    return cows;
-                    break;
-                case 2:
-                    return tigers;
-                    break;
-                case 3:
-                    return grass;
-                    break;
+            // Костыль, очень редко выплывает одна ячейка не заполнена
+            // if (!value) {
+            //     return ground;
+            // }
+            var unit = [ground, cows, tigers, grass];
+
+            // if (unit.indexOf(+value) != -1) {
+            if (unit[+value] != undefined) {
+                return unit[+value];
+            } else {
+                return ground;
             }
         },
         render: function (map) {
@@ -145,7 +140,7 @@ var game = (function ($) {
 
                 for (var col = 0; col < map.col; col++) {
 
-                    mapHTML += "<div class='cell'> " + this.getObj(map.mapData[row][col]).show() + "</div>";
+                    mapHTML += "<div class='cell'> " + this.getObj(map, row, col).show() + "</div>";
 
                 }
 
@@ -267,7 +262,7 @@ var game = (function ($) {
             return "<div class='cow'></div>";
         },
         move: function () {
-            
+
         }
     };
 
