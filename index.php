@@ -31,7 +31,8 @@
                     min: 2,
                     max: 4
                 },
-                devMode: true
+                devMode: false,
+                timeRender: 10
             };
            game.init($('#game'), setting);
         });

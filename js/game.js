@@ -57,11 +57,15 @@
 
 var game = (function ($) {
 
+
+
     // Ядро игры
     var game = {
         devMode: false,
+        timeRender: 1000,
         init: function ($gameContainer, setting) {
             this.devMode = setting.devMode;
+            this.timeRender = setting.timeRender;
 
             grass.min = setting.grass.min;
             grass.max = setting.grass.max;
@@ -85,10 +89,10 @@ var game = (function ($) {
             if (!this.devMode) {
                 // Главный Loop
                 setInterval(function () {
-                    scene.render();
-                }, 1000);
+                    scene.render(map);
+                }, this.timeRender);
             } else {
-                scene.render();
+                scene.render(map);
             }
         }
     };
@@ -104,33 +108,17 @@ var game = (function ($) {
             map.generate(cows);
             // Добавим тигров
             map.generate(tigers);
-
             // Добавим землю
             map.generate(ground);
 
             console.log(map.mapData);
         },
-        render: function () {
-            var map = '';
-
-            // console.log(mapData);
-            // Построим игровое поле
-            // for (var row = 0; row < setting.map.row; row++) {
-            //
-            //     map += "<div class='row'>";
-            //
-            //     for (var col = 0; col < setting.map.col; col++) {
-            //
-            //         map += "<div class='cell'> " + this.getObj(mapData[row][col]).show() + "</div>";
-            //
-            //     }
-            //
-            //     map += "</div>";
-            // }
-
-            // $(gameContainer).find(".plain").html(map);
-        },
         getObj: function (value) {
+            // Костыль, очень редко выплывает одна ячейка не заполнена
+            if (value == undefined ) {
+                return ground;
+            }
+
             switch (parseInt(value)) {
                 case 0:
                     return ground;
@@ -145,6 +133,26 @@ var game = (function ($) {
                     return grass;
                     break;
             }
+        },
+        render: function (map) {
+            var mapHTML = '';
+
+            // console.log(mapData);
+            // Построим игровое поле
+            for (var row = 0; row < map.row; row++) {
+
+                mapHTML += "<div class='row'>";
+
+                for (var col = 0; col < map.col; col++) {
+
+                    mapHTML += "<div class='cell'> " + this.getObj(map.mapData[row][col]).show() + "</div>";
+
+                }
+
+                mapHTML += "</div>";
+            }
+
+            $(this.gameContainer).find(".plain").html(mapHTML);
         }
     };
 
@@ -169,10 +177,23 @@ var game = (function ($) {
             // Пройдемся по этому количевству
             for (var i = 0; i < objCountOnMap; i++) {
 
-                // создадим координаты для проставления
                 var mapRowCol = this.getRandomRowColCoord();
 
                 // console.log('mapRowColNormal: ', mapRowCol);
+                //
+                // do {
+                //
+                //     var isCoordAdd = false;
+                //
+                //     // создадим координаты для проставления
+                //     var mapRowCol = this.getRandomRowColCoord();
+                //
+                //     if (this.mapData[mapRowCol.row][mapRowCol.col] == undefined) {
+                //         this.mapData[mapRowCol.row][mapRowCol.col] = obj.id;
+                //         isCoordAdd = true;
+                //     }
+                //
+                // } while(isCoordAdd);
 
                 if (this.mapData[mapRowCol.row][mapRowCol.col] == undefined) {
                     this.mapData[mapRowCol.row][mapRowCol.col] = obj.id;
@@ -221,7 +242,7 @@ var game = (function ($) {
     var ground = {
         id: 0,
         min: 20,
-        max: 50,
+        max: 200,
         show: function () {
             return "<div class='null'></div>";
         }
@@ -244,6 +265,9 @@ var game = (function ($) {
         max: 3,
         show: function () {
             return "<div class='cow'></div>";
+        },
+        move: function () {
+            
         }
     };
 
@@ -257,6 +281,14 @@ var game = (function ($) {
         }
     };
 
+    var controls = {
+        init: function () {
+            // Персонаж
+            // Карта
+            //
+        }
+    }
+    
     // Вспомогательные функции для игры
     var tools = {
 
