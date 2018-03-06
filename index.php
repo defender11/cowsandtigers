@@ -16,8 +16,8 @@
         $(function () {
             var setting = {
                 map: {
-                    row: 12,
-                    col: 12
+                    row: 6,
+                    col: 6
                 },
                 grass: {
                     min: 2,
