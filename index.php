@@ -11,7 +11,8 @@
     <link rel="stylesheet" href="css/style.css">
 
     <script src="js/jquery-3.2.1.min.js"></script>
-    <script src="js/game.js"></script>
+<!--    <script src="js/game.js"></script>-->
+    <script src="js/cowsandtigers.js"></script>
     <script>
         $(function () {
             var setting = {
@@ -34,7 +35,7 @@
                 devMode: true,
                 timeRender: 1000
             };
-           game.init($('#game'), setting);
+            cowsandtigers.init($('#game'), setting);
         });
     </script>
 </head>
