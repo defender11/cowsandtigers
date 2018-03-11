@@ -43,8 +43,8 @@ html {
 
 #game .cell .null,
 #game .cell .death,
-#game .cell .cow,
-#game .cell .tiger,
+#game .cell .cows,
+#game .cell .tigers,
 #game .cell .grass,
 #game .cell .food {
     width: 100%;

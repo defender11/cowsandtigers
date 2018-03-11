@@ -33,7 +33,7 @@
                     max: 4
                 },
                 devMode: true,
-                timeRender: 1000
+                timeRender: 500
             };
             cowsandtigers.init($('#game'), setting);
         });
