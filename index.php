@@ -20,18 +20,32 @@
                     row: 6,
                     col: 6
                 },
-                grass: {
-                    min: 2,
-                    max: 6
-                },
-                cows: {
-                    min: 3,
-                    max: 6
-                },
-                tigers: {
-                    min: 2,
-                    max: 4
-                },
+                mapObjects: [
+                    {
+                        ground: {
+                            min: null,
+                            max: null
+                        }
+                    },
+                    {
+                        grass: {
+                            min: 2,
+                            max: 6
+                        }
+                    },
+                    {
+                        cows: {
+                            min: 3,
+                            max: 6
+                        }
+                    },
+                    {
+                        tigers: {
+                            min: 2,
+                            max: 4
+                        }
+                    }
+                ],
                 devMode: true,
                 timeRender: 500
             };
