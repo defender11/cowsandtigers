@@ -11,53 +11,43 @@
     <link rel="stylesheet" href="css/style.css">
 
     <script src="js/jquery-3.2.1.min.js"></script>
-<!--    <script src="js/game.js"></script>-->
     <script src="js/cowsandtigers.js"></script>
     <script>
         $(function () {
             var setting = {
-                map: {
+                gameContainerID: 'game',
+                mapSize: {
                     row: 6,
                     col: 6
                 },
-                mapObjects: [
-                    {
-                        ground: {
-                            min: null,
-                            max: null
-                        }
+                mapObjects: {
+                    grass: {
+                        min: 3,
+                        max: 6
                     },
-                    {
-                        grass: {
-                            min: 2,
-                            max: 6
-                        }
+                    cows: {
+                        min: 3,
+                        max: 6
                     },
-                    {
-                        cows: {
-                            min: 3,
-                            max: 6
-                        }
+                    tigers: {
+                        min: 2,
+                        max: 4
                     },
-                    {
-                        tigers: {
-                            min: 2,
-                            max: 4
-                        }
+                    ground: {
+                        min: null,
+                        max: null
                     }
-                ],
+                },
                 devMode: true,
                 timeRender: 500
             };
-            cowsandtigers.init($('#game'), setting);
+            cowsandtigers.init(setting);
         });
     </script>
 </head>
 <body>
     <h1>Game: Cows And Tigers</h1>
     <div id="game">
-        <progress max="100" value="0" style="display: none;"></progress>
-        <div class="process"></div>
         <div class="plain"></div>
     </div>
 </body>

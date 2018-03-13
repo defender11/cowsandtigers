@@ -41,7 +41,7 @@ html {
     z-index: 100;
 }
 
-#game .cell .null,
+#game .cell .ground,
 #game .cell .death,
 #game .cell .cows,
 #game .cell .tigers,
@@ -55,15 +55,15 @@ html {
     left: 0;
 }
 
-#game .cell .null {
+#game .cell .ground {
     background: url('../img/ground.jpeg')center;
     background-size: cover;
 }
-#game .cell .cow {
+#game .cell .cows {
     background: url('../img/cow.png')center;
     background-size: cover;
 }
-#game .cell .tiger {
+#game .cell .tigers {
     background: url('../img/tiger.png')center;
     background-size: cover;
 }
