@@ -8,7 +8,7 @@ html {
 }
 #game .plain {
     display: flex;
-    flex-flow:row wrap;
+    flex-flow:row nowrap;
     justify-content: flex-start;
 }
 #game .row {
