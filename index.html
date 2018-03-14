@@ -5,6 +5,8 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <title>Game: Cows And Tigers</title>
 
     <link rel="stylesheet" href="css/normalize.css">
@@ -13,42 +15,48 @@
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/cowsandtigers.js"></script>
     <script>
+        var setting = {
+            gameContainerID: 'game',
+            mapSize: {
+                row: 6,
+                col: 6
+            },
+            mapObjects: {
+                grass: {
+                    min: 6,
+                    max: 10
+                },
+                cows: {
+                    min: 3,
+                    max: 5
+                },
+                tigers: {
+                    min: 2,
+                    max: 3
+                },
+                ground: {
+                    min: null,
+                    max: null
+                }
+            },
+            devMode: true,
+            timeRender: 500
+        };
+
+
+        // После загрузки документа запустим игру
         $(function () {
-            var setting = {
-                gameContainerID: 'game',
-                mapSize: {
-                    row: 8,
-                    col: 8
-                },
-                mapObjects: {
-                    grass: {
-                        min: 3,
-                        max: 6
-                    },
-                    cows: {
-                        min: 3,
-                        max: 6
-                    },
-                    tigers: {
-                        min: 2,
-                        max: 4
-                    },
-                    ground: {
-                        min: null,
-                        max: null
-                    }
-                },
-                devMode: true,
-                timeRender: 500
-            };
             cowsandtigers.init(setting);
         });
     </script>
 </head>
 <body>
-    <h1>Game: Cows And Tigers</h1>
-    <div id="game">
-        <div class="plain"></div>
-    </div>
+    <section class="head">
+        <div class="logo"></div>
+        <h1 class="title">Cows And Tigers</h1>
+    </section>
+    <section id="game">
+        <div id="plain"></div>
+    </section>
 </body>
 </html>

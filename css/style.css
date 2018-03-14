@@ -1,12 +1,35 @@
 html {
     background: #333333;
 }
+.head {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    position: relative;
+    width: 450px;
+    margin: 10px;
+}
+.logo {
+    display: block;
+    width: 60px;
+    height: 60px;
+    background: url(/favicon.ico) left no-repeat;
+    background-size: cover;
+}
+.title {
+    align-self: center;
+    padding: 0;
+    margin: 0;
+    margin-left: 10px;
+    color: #a7a4a4;
+    text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.9);
+}
 #game {
     display: block;
     position: relative;
     margin: 10px;
 }
-#game .plain {
+#game  #plain {
     display: flex;
     flex-flow:row nowrap;
     justify-content: flex-start;

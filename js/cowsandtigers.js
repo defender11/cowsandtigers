@@ -6,7 +6,9 @@
  * MAKE OBJECTS ALGORITHM
  */
 var cowsandtigers = (function () {
+
     var devMode = false;
+
 
     /**
      * OBJ GAME
@@ -26,6 +28,7 @@ var cowsandtigers = (function () {
         this.scene = new Scene(this.setting);
     }
 
+
     /**
      * GAME LOOP
      */
@@ -44,6 +47,8 @@ var cowsandtigers = (function () {
             this.scene.render();
         }
     };
+    // ------------------------------------------
+
 
     /**
      * Игровая сцена
@@ -52,8 +57,11 @@ var cowsandtigers = (function () {
      */
     function Scene(setting) {
         this.gameContainer = document.getElementById(setting.gameContainerID);
+        this.plain = document.getElementById('plain');
         this.map = new Map(setting);
     }
+
+
     /**
      * Проинициализируем карту и заполним ее объектами
      */
@@ -61,11 +69,12 @@ var cowsandtigers = (function () {
         this.map.init();
         this.map.generate();
     };
+
+
     /**
      * Отрисовка заполненной карты
      */
     Scene.prototype.render = function () {
-        var $gameContainer = this.gameContainer;
         var mapHTML = '';
 
         // Построим игровое поле
@@ -78,8 +87,10 @@ var cowsandtigers = (function () {
         }
 
         // Добавим собранную HTML карту в DOM
-        $gameContainer.querySelectorAll('.plain')[0].innerHTML = mapHTML;
+        this.plain.innerHTML = mapHTML;
     };
+
+
     /**
      * Получим объект из массива по Row/Col для отображения в HTML
      * @param row
@@ -89,6 +100,8 @@ var cowsandtigers = (function () {
     Scene.prototype.getObject = function (row, col) {
       return this.map.mapData[row][col];
     };
+
+
     /**
      * Действия всех объектов на карте
      */
@@ -100,8 +113,9 @@ var cowsandtigers = (function () {
     };
     // ------------------------------------------
 
+
     /**
-     * Прототип работы с картой
+     * Класс работы с картой
      * @param setting
      * @constructor
      */
@@ -113,17 +127,21 @@ var cowsandtigers = (function () {
         this.row = setting.mapSize.row || 0;
         this.col = setting.mapSize.col || 0;
     }
+
+
     /**
      * Построим пустую карту на основе начальных Row/Col
      */
     Map.prototype.init = function () {
         while(this.mapData.push([]) < this.row);
     };
+
+
     /**
      * Генерация карты
      */
     Map.prototype.generate = function () {
-        // object ID
+
         var objID = 0;
 
         for(var objectName in this.mapObjects ) {
@@ -155,26 +173,28 @@ var cowsandtigers = (function () {
                 // console.log('mapRowColNormal: ', mapRowCol);
 
                 if (this.mapData[mapRowCol.row][mapRowCol.col] == undefined) {
-                    var object = new ObjectOnMap(objectName, objID, mapRowCol.row, mapRowCol.col);
+                    var unit = new Unit(objectName, objID, mapRowCol.row, mapRowCol.col);
 
-                    this.mapData[mapRowCol.row][mapRowCol.col] = object;
+                    this.mapData[mapRowCol.row][mapRowCol.col] = unit;
 
                     if (!isStaticObject) {
-                        this.objectsOnMap.push(object);
+                        this.objectsOnMap.push(unit);
                     }
                 } else {
-                    var objectSetting = {
+                    var unitSetting = {
                         objID: objID,
                         objectName: objectName,
                         isStaticObject: isStaticObject
                     };
-                    this.tryNewGenerate(objectSetting, objCountOnMap);
+                    this.tryNewGenerate(unitSetting, objCountOnMap);
                 }
             }
 
             objID++;
         }
     };
+
+
     /**
      * Повторная генерация, в случии занятого места в массиве
      * @param objectSetting
@@ -194,25 +214,27 @@ var cowsandtigers = (function () {
             // console.log('mapRowColRecursive: ', mapRowCol);
 
             if (this.mapData[mapRowCol.row][mapRowCol.col] == undefined) {
-                var object = new ObjectOnMap(objectSetting.objectName, objectSetting.objID, mapRowCol.row, mapRowCol.col);
+                var unit = new Unit(objectSetting.objectName, objectSetting.objID, mapRowCol.row, mapRowCol.col);
 
-                this.mapData[mapRowCol.row][mapRowCol.col] = object;
+                this.mapData[mapRowCol.row][mapRowCol.col] = unit;
 
                 if (!objectSetting.isStaticObject) {
-                    this.objectsOnMap.push(object);
+                    this.objectsOnMap.push(unit);
                 }
 
                 return false;
             } else {
-                var objectSetting = {
+                var unitSetting = {
                     objID: objectSetting.objID,
                     objectName: objectSetting.objectName,
                     isStaticObject: objectSetting.isStaticObject
                 };
-                return this.tryNewGenerate(objectSetting, count - 1);
+                return this.tryNewGenerate(unitSetting, count - 1);
             }
         }
     };
+
+
     /**
      * Получим произвольные координаты на основе кол-во строк и колонок
      * @returns {{row: *, col: *}}
@@ -228,6 +250,7 @@ var cowsandtigers = (function () {
     };
     // ------------------------------------------
 
+
     /**
      * Основной Прототип объекта на карте
      * @param className
@@ -236,38 +259,43 @@ var cowsandtigers = (function () {
      * @param objPositionCol
      * @constructor
      */
-    function ObjectOnMap(className, id, objPositionRow, objPositionCol) {
+    function Unit(className, id, objPositionRow, objPositionCol) {
         this.id = id;
         this.className = className;
-        this.objectPositionRow = objPositionRow || 0;
-        this.objectPositionCol = objPositionCol || 0;
+        this.positionRow = objPositionCol;
+        this.positionCol = objPositionRow;
+        this.health = 100;
 
         // Выберим алгоритм поведения для объекта
-        this.objectAlgoritms = this.selectAlgorithm(this.id) || {};
-        
-        console.log(this);
+        this.algoritms = this.selectAlgorithm(this) || {};
     }
+
+
     /**
      * Вывод HTML объекта
      * @returns {string}
      */
-    ObjectOnMap.prototype.show = function () {
+    Unit.prototype.show = function () {
         return "<div class='"+this.className+"'></div>";
     };
+
+
     /**
      * Разные действия объекта
      */
-    ObjectOnMap.prototype.action = function (map) {
-        if (this.objectAlgoritms) {
-            this.objectAlgoritms.move(this, map);
+    Unit.prototype.action = function (map) {
+        if (this.algoritms) {
+            this.algoritms.action(map);
         }
     };
+
+
     /**
      * Вернет для объекта его алгоритм поведения в игре
      * @param id
      * @returns {*}
      */
-    ObjectOnMap.prototype.selectAlgorithm = function (id) {
+    Unit.prototype.selectAlgorithm = function () {
         /**
          * 0 - grass
          * 1 - cows
@@ -276,63 +304,70 @@ var cowsandtigers = (function () {
          * 4 - death
          */
 
-        // var objectsAlgoritm = [
-        //     new GrassAlgorithm(),
-        //     new CowsAlgorithm(),
-        //     new TigersAlgorithm(),
-        //     new GroundAlgorithm()
-        // ];
-
-        switch (parseInt(id)) {
+        switch (parseInt(this.id)) {
             case 0:
-                return new GrassAlgorithm();
+                return new GrassAlgorithm(this);
                 break;
             case 1:
-                return new CowsAlgorithm();
+                return new CowsAlgorithm(this);
                 break;
             case 2:
-                return new TigersAlgorithm();
+                return new TigersAlgorithm(this);
                 break;
             case 3:
-                return new GroundAlgorithm();
+                return new GroundAlgorithm(this);
                 break;
             case 4:
-                return new DeathAlgorithm();
+                return new DeathAlgorithm(this);
                 break;
         }
     };
     // ------------------------------------------
 
+
     /**
      * Агоритм повидения объектов
      * @constructor
      */
-    function Algorithm (objectClassName) {}
-    Algorithm.prototype.init = function () {
+    function Algorithm (unit) {
+        this.unit = unit;
 
-        // Проверим и вернем координаты хотя бы одной безопасной клетки
-        // return {
-        //  safe: true, false;
-        //  safeCellCoordinates: [{row: 0, cell: 0},{row: 1, cell: 0}];
-        // }
-        var neighborsCellReport = this.isAnyNeighborsCellSafe(obj, map);
+    }
+
+
+    Algorithm.prototype.action = function (map) {
+
+        // this.isAnyNeighborsCellSafe();
 
         // if (neighborsCellReport.safe) {
         //     this.move(obj, map, neighborsCellReport.safeCellCoordinates);
         // }
+
+        // Осмотримся
+        // - Проверим соседнии клетки:
+        //      - На границы карты
+        //      - На хищников
+        //      - На еду
+        //  Если в соседней клетки есть еда, то она становиться приоритетом
+        //  Если еды нет, но есть хищник, то бежим от него.
+        //  Направление выберим произвольно исключая направления хищника, если он есть.
+
+        this.doesNotGoBeyondBorders(map);
     };
+
+
     Algorithm.prototype.isAnyNeighborsCellSafe = function (obj, map) {
 
 
-        var elsCoord = [];
-
-        for (var i = 0; i < obj.coordinate.length; i++) {
-
-            // Доделать и проверить, не правильно определяет границы
-            var safeWays = this.doesNotGoBeyondBorders(obj.coordinate[i], map);
-
-            console.log(safeWays);
-        }
+        // var elsCoord = [];
+        //
+        // for (var i = 0; i < obj.coordinate.length; i++) {
+        //
+        //     Доделать и проверить, не правильно определяет границы
+            // var safeWays = this.doesNotGoBeyondBorders(obj.coordinate[i], map);
+            //
+            // console.log(safeWays);
+        // }
 
         // for (var row = 0; row < map.row; row++) {
         //     for (var col = 0; col < map.col; col++) {
@@ -346,19 +381,26 @@ var cowsandtigers = (function () {
         // }
         // return elsCoord;
     };
-    // Проверим не зашли ли за границы
-    Algorithm.prototype.doesNotGoBeyondBorders = function (elementCoord, map) {
-        // Не забыть про границы карты
-        var leftTopAngle = 0,
-            left = 0,
-            right = map.cell,
-            top = 0,
-            bottom = map.row,
-            rightTopAngle = map.cell,
-            leftBottomAngle = map.row,
-            rightBottomAngle = map.cell;
 
-        var safeAngle = {
+
+    // Проверим не зашли ли за границы +
+    Algorithm.prototype.doesNotGoBeyondBorders = function (map) {
+        var unitPositionRow = parseInt(this.unit.positionRow);
+        var unitPositionCol = parseInt(this.unit.positionCol);
+
+        // Не забыть про границы карты
+        var border = {
+            top: 0,
+            topRight: map.col,
+            right: map.col,
+            rightBottom: map.col,
+            bottom: map.row,
+            leftBottom: 0,
+            left: 0,
+            leftTop: 0
+        }
+
+        var safeCell = {
             top: false,
             topRight: false,
             right: false,
@@ -369,88 +411,123 @@ var cowsandtigers = (function () {
             leftTop: false
         };
 
-        // Проверим ячейку с вверху
-        if ((elementCoord.col - 1) >= top) {
-            safeAngle.top = true;
-        }
-        // Проверим ячейку с вверху-вправо
-        if ((elementCoord.row + 1 ) >= top && (elementCoord.col - 1) <= rightTopAngle) {
-            safeAngle.topRight = true;
-        }
-        // Проверим ячейку с вправо
-        if ((elementCoord.row + 1 ) <= rightTopAngle) {
-            safeAngle.right = true;
-        }
-        // Проверим ячейку с вправо-внизу
-        if ((elementCoord.row + 1 ) <= rightTopAngle && (elementCoord.col + 1) <=  rightBottomAngle) {
-            safeAngle.rightBottom = true;
-        }
-        // Проверим ячейку внизу
-        if ((elementCoord.col + 1) <=  bottom) {
-            safeAngle.bottom = true;
-        }
-        // Проверим ячейку с слева-внизу
-        if ((elementCoord.row - 1 ) <= leftBottomAngle && (elementCoord.col + 1) <=  bottom) {
-            safeAngle.leftBottom = true;
-        }
-        // Проверим ячейку с слева
-        if ((elementCoord.row - 1 ) <= left) {
-            safeAngle.left = true;
-        }
-        // Проверим ячейку с лева-вверху
-        if ((elementCoord.row - 1 ) <= left && (elementCoord.col - 1 ) <= top) {
-            safeAngle.leftTop = true;
+
+        // TOP Проверим ячейку с вверху +
+        if ((unitPositionRow - 1) >= border.top) {
+            safeCell.top = true;
         }
 
-        return safeAngle;
+
+        // TOP_RIGHT Проверим ячейку с вверху-вправо +
+        if (
+            (unitPositionRow - 1 ) >= border.top
+            && (unitPositionCol + 1) < border.topRight
+        ) {
+            safeCell.topRight = true;
+        }
+
+
+        // RIGHT Проверим ячейку с вправо +
+        if ((unitPositionCol + 1 ) < border.right) {
+            safeCell.right = true;
+        }
+
+
+        // RIGHT_BOTTOM Проверим ячейку с вправо-внизу +
+        if (
+            (unitPositionRow + 1 ) < border.bottom
+            &&
+            (unitPositionCol + 1) <  border.rightBottom
+        ) {
+            safeCell.rightBottom = true;
+        }
+
+        
+        // BOTTOM Проверим ячейку внизу +
+        if ((unitPositionRow + 1) <  border.bottom) {
+            safeCell.bottom = true;
+        }
+
+
+        // LEFT_BOTTOM Проверим ячейку с слева-внизу +
+        if (
+            (unitPositionRow + 1 ) < border.bottom
+            &&
+            (unitPositionCol - 1) >=  border.leftBottom
+        ) {
+            safeCell.leftBottom = true;
+        }
+
+
+        // LEFT Проверим ячейку с слева +
+        if ((unitPositionCol - 1 ) >= border.left) {
+            safeCell.left = true;
+        }
+
+
+        // LEFT_TOP Проверим ячейку с лева-вверху +
+        if (
+            (unitPositionRow - 1 ) <= border.top
+            &&
+            (unitPositionCol - 1 ) <= border.left
+        ) {
+            safeCell.leftTop = true;
+        }
+
+        console.log(this.unit);
+        console.log(safeCell);
+        console.log("ROW: " + unitPositionRow, "COL: " + unitPositionCol );
+
+        return safeCell;
     };
+
+
     Algorithm.prototype.findSafeWays = function (obj, map) {
 
     };
+
+
     Algorithm.prototype.move = function (obj, map) {
         console.log("Algorithm work");
-        // console.log(obj);
-        // console.log(map);
-
 
     };
     // ------------------------------------------
     
     // COWS ALGORITM
-    function CowsAlgorithm() {
-        console.log('CowsAlgorithm');
+    function CowsAlgorithm(unit) {
+        Algorithm.call(this, unit);
     }
     CowsAlgorithm.prototype = new Algorithm();
     CowsAlgorithm.constructor = 'CowsAlgorithm';
     // ------------------------------------------
 
     // TIGERS ALGORITM
-    function TigersAlgorithm() {
-        console.log('TigersAlgorithm');
+    function TigersAlgorithm(unit) {
+        Algorithm.call(this, unit);
     }
     TigersAlgorithm.prototype = new Algorithm();
     TigersAlgorithm.constructor = 'TigersAlgorithm';
     // ------------------------------------------
 
     // GRASS ALGORITM
-    function GrassAlgorithm() {
-        console.log('GrassAlgorithm');
+    function GrassAlgorithm(unit) {
+        Algorithm.call(this, unit);
     }
     GrassAlgorithm.prototype = new Algorithm();
     GrassAlgorithm.constructor = 'GrassAlgorithm';
     // ------------------------------------------
 
     // GROUND ALGORITM
-    function GroundAlgorithm() {
-        console.log('GroundAlgorithm');
+    function GroundAlgorithm(unit) {
+        Algorithm.call(this, unit);
     }
     GroundAlgorithm.prototype = new Algorithm();
     GroundAlgorithm.constructor = 'GroundAlgorithm';
     // ------------------------------------------
 
     // DEATH ALGORITM
-    function DeathAlgorithm() {
-        console.log('DeathAlgorithm');
+    function DeathAlgorithm(unit) {
+        Algorithm.call(this, unit);
     }
     DeathAlgorithm.prototype = new Algorithm();
     DeathAlgorithm.constructor = 'DeathAlgorithm';
