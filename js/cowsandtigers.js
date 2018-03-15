@@ -248,6 +248,16 @@ var cowsandtigers = (function () {
             col: tools.randomInteger(0, countCol)
         }
     };
+
+
+    Map.prototype.set = function (unit, newUnit) {
+        this.mapData[unit.positionRow][unit.positionCol] = newUnit;
+    }
+
+
+    Map.prototype.get = function (unit) {
+        return this.mapData[unit.positionRow][unit.positionCol];
+    }
     // ------------------------------------------
 
 
@@ -264,6 +274,7 @@ var cowsandtigers = (function () {
         this.className = className;
         this.positionRow = objPositionCol;
         this.positionCol = objPositionRow;
+        this.foodType = this.getFoodType();
         this.health = 100;
 
         // Выберим алгоритм поведения для объекта
@@ -288,6 +299,23 @@ var cowsandtigers = (function () {
             this.algoritms.action(map);
         }
     };
+
+    /**
+     * Получим цель ради которой живет Unit :)
+     * @returns {*}
+     */
+    Unit.prototype.getFoodType = function () {
+        switch(this.className) {
+            case 'cows':
+                return 'grass';
+                break;
+            case 'tigers':
+                return 'cows';
+                break;
+            default:
+                return null;
+        }
+    }
 
 
     /**
@@ -331,17 +359,11 @@ var cowsandtigers = (function () {
      */
     function Algorithm (unit) {
         this.unit = unit;
-
+        this.neighboringCells = null;
     }
 
-
+    // Главный мотиватор действий в игре
     Algorithm.prototype.action = function (map) {
-
-        // this.isAnyNeighborsCellSafe();
-
-        // if (neighborsCellReport.safe) {
-        //     this.move(obj, map, neighborsCellReport.safeCellCoordinates);
-        // }
 
         // Осмотримся
         // - Проверим соседнии клетки:
@@ -352,41 +374,23 @@ var cowsandtigers = (function () {
         //  Если еды нет, но есть хищник, то бежим от него.
         //  Направление выберим произвольно исключая направления хищника, если он есть.
 
-        this.doesNotGoBeyondBorders(map);
+        // Проверим соседнии клетки
+        this.neighboringsCell = this.checkUnitNeighboringsCell(map);
+
+        // Посмотрим есть ли вокруг еда
+        var neighboringsCellWithFood = this.hasFood(this.neighboringsCell);
+
+        if (neighboringsCellWithFood) {
+            console.log(neighboringsCellWithFood);
+            this.move(map);
+        }
     };
 
-
-    Algorithm.prototype.isAnyNeighborsCellSafe = function (obj, map) {
-
-
-        // var elsCoord = [];
-        //
-        // for (var i = 0; i < obj.coordinate.length; i++) {
-        //
-        //     Доделать и проверить, не правильно определяет границы
-            // var safeWays = this.doesNotGoBeyondBorders(obj.coordinate[i], map);
-            //
-            // console.log(safeWays);
-        // }
-
-        // for (var row = 0; row < map.row; row++) {
-        //     for (var col = 0; col < map.col; col++) {
-        //         if (map.mapData[row][col] == obj.id) {
-        //             elsCoord.push({
-        //                 row: row,
-        //                 col: col
-        //             });
-        //         }
-        //     }
-        // }
-        // return elsCoord;
-    };
-
-
-    // Проверим не зашли ли за границы +
-    Algorithm.prototype.doesNotGoBeyondBorders = function (map) {
+    // Проверим соседнии клетки +
+    Algorithm.prototype.checkUnitNeighboringsCell = function (map) {
         var unitPositionRow = parseInt(this.unit.positionRow);
         var unitPositionCol = parseInt(this.unit.positionCol);
+        var mapDate = map.mapData;
 
         // Не забыть про границы карты
         var border = {
@@ -400,21 +404,53 @@ var cowsandtigers = (function () {
             leftTop: 0
         }
 
-        var safeCell = {
-            top: false,
-            topRight: false,
-            right: false,
-            rightBottom: false,
-            bottom: false,
-            leftBottom: false,
-            left: false,
-            leftTop: false
-        };
-
+        var cells = [
+            {
+                direction: 'top',
+                exist: false,
+                content: ''
+            },
+            {
+                direction: 'topRight',
+                exist: false,
+                content: ''
+            },
+            {
+                direction: 'right',
+                exist: false,
+                content: ''
+            },
+            {
+                direction: 'rightBottom',
+                exist: false,
+                content: ''
+            },
+            {
+                direction: 'bottom',
+                exist: false,
+                content: ''
+            },
+            {
+                direction: 'leftBottom',
+                exist: false,
+                content: ''
+            },
+            {
+                direction: 'left',
+                exist: false,
+                content: ''
+            },
+            {
+                direction: 'leftTop',
+                exist: false,
+                content: ''
+            }
+        ];
 
         // TOP Проверим ячейку с вверху +
         if ((unitPositionRow - 1) >= border.top) {
-            safeCell.top = true;
+            cells[0].exist = true;
+            cells[0].content = mapDate[unitPositionRow - 1][unitPositionCol];
         }
 
 
@@ -423,13 +459,15 @@ var cowsandtigers = (function () {
             (unitPositionRow - 1 ) >= border.top
             && (unitPositionCol + 1) < border.topRight
         ) {
-            safeCell.topRight = true;
+            cells[1].exist = true;
+            cells[1].content = mapDate[unitPositionRow - 1][unitPositionCol + 1];
         }
 
 
         // RIGHT Проверим ячейку с вправо +
         if ((unitPositionCol + 1 ) < border.right) {
-            safeCell.right = true;
+            cells[2].exist = true;
+            cells[2].content = mapDate[unitPositionRow][unitPositionCol + 1];
         }
 
 
@@ -439,13 +477,15 @@ var cowsandtigers = (function () {
             &&
             (unitPositionCol + 1) <  border.rightBottom
         ) {
-            safeCell.rightBottom = true;
+            cells[3].exist = true;
+            cells[3].content = mapDate[unitPositionRow + 1][unitPositionCol + 1];
         }
 
         
         // BOTTOM Проверим ячейку внизу +
         if ((unitPositionRow + 1) <  border.bottom) {
-            safeCell.bottom = true;
+            cells[4].exist = true;
+            cells[4].content = mapDate[unitPositionRow + 1][unitPositionCol];
         }
 
 
@@ -455,40 +495,85 @@ var cowsandtigers = (function () {
             &&
             (unitPositionCol - 1) >=  border.leftBottom
         ) {
-            safeCell.leftBottom = true;
+            cells[5].exist = true;
+            cells[5].content = mapDate[unitPositionRow + 1][unitPositionCol - 1];
         }
 
 
         // LEFT Проверим ячейку с слева +
         if ((unitPositionCol - 1 ) >= border.left) {
-            safeCell.left = true;
+            cells[6].exist = true;
+            cells[6].content = mapDate[unitPositionRow][unitPositionCol - 1];
         }
 
 
         // LEFT_TOP Проверим ячейку с лева-вверху +
         if (
-            (unitPositionRow - 1 ) <= border.top
+            (unitPositionRow - 1 ) >= border.top
             &&
-            (unitPositionCol - 1 ) <= border.left
+            (unitPositionCol - 1 ) >= border.left
         ) {
-            safeCell.leftTop = true;
+            cells[7].exist = true;
+            cells[7].content = mapDate[unitPositionRow - 1][unitPositionCol - 1];
         }
 
-        console.log(this.unit);
-        console.log(safeCell);
-        console.log("ROW: " + unitPositionRow, "COL: " + unitPositionCol );
+        // console.log(this.unit);
+        // console.log(cells);
+        // console.log("ROW: " + unitPositionRow, "COL: " + unitPositionCol );
 
-        return safeCell;
+        return cells;
     };
 
 
-    Algorithm.prototype.findSafeWays = function (obj, map) {
+    /**
+     * Посмотрим есть ли вокруг еда
+     * @param neighboringsCell
+     * @param foodType
+     * @returns {*}
+     */
+    Algorithm.prototype.hasFood = function (neighboringsCell) {
+        var foodType =  this.unit.foodType;
+        
+        console.log(this.unit.className);
+        
+        if (foodType !== null) {
+
+            var foodTypeRowCol = [];
+
+            // Переберем полученный массив с ячейками находящимися рядом
+            for (var i = 0; i < neighboringsCell.length; i++) {
+
+                // Ячейка не выходит за границы
+                if (neighboringsCell[i].exist) {
+
+                    console.log(foodType);
+                    //
+                    if (neighboringsCell[i].content.className == foodType) {
+                        foodTypeRowCol.push(
+                            {
+                                foodType: foodType,
+                                foodRow: neighboringsCell[i].content.positionRow,
+                                foodCol: neighboringsCell[i].content.positionCol
+                            }
+                        );
+                    }
+                }
+            }
+            return foodTypeRowCol;
+        }
+
+        return false;
+    };
+
+    Algorithm.prototype.hasEnemy = function (map) {
 
     };
 
 
-    Algorithm.prototype.move = function (obj, map) {
+    Algorithm.prototype.move = function (map) {
         console.log("Algorithm work");
+
+    //    Временно сделаем
 
     };
     // ------------------------------------------
@@ -499,6 +584,14 @@ var cowsandtigers = (function () {
     }
     CowsAlgorithm.prototype = new Algorithm();
     CowsAlgorithm.constructor = 'CowsAlgorithm';
+
+
+    CowsAlgorithm.prototype.move = function (map) {
+        // console.log("Algorithm work: " + this.unit.className);
+
+        // console.log(this.neighboringsCell);
+
+    };
     // ------------------------------------------
 
     // TIGERS ALGORITM
