@@ -1,7 +1,9 @@
 html {
     background: #333333;
 }
-.head {
+
+/*BLOCK HEAD*/
+.b-head {
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
@@ -9,14 +11,14 @@ html {
     width: 450px;
     margin: 10px;
 }
-.logo {
+.b-head .b-head__logo .b-logo__img {
     display: block;
     width: 60px;
     height: 60px;
     background: url(/favicon.ico) left no-repeat;
     background-size: cover;
 }
-.title {
+.b-head .b-head__title .b-title__text {
     align-self: center;
     padding: 0;
     margin: 0;
@@ -24,22 +26,23 @@ html {
     color: #a7a4a4;
     text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.9);
 }
-#game {
+
+/*BLOCK MAIN GAME*/
+#b-game {
     display: block;
     position: relative;
     margin: 10px;
 }
-#game  #plain {
+#b-game  #b-game__plain {
     display: flex;
     flex-flow:row nowrap;
     justify-content: flex-start;
 }
-#game .row {
+#b-game #b-game__plain .row {
     display: block;
     position: relative;
 }
-
-#game .cell {
+#b-game #b-game__plain .cell {
     display: block;
     position: relative;
     background: #452b14;
@@ -51,8 +54,7 @@ html {
     font: bold 14px Tahoma, Arial, sans-serif;
     text-align: right;
 }
-
-#game .cell .positionCell {
+#b-game #b-game__plain .cell .positionCell {
     position: absolute;
     right: 0;
     top: 0;
@@ -63,13 +65,12 @@ html {
     border-radius: 0px 0px 0px 6px;
     z-index: 100;
 }
-
-#game .cell .ground,
-#game .cell .death,
-#game .cell .cows,
-#game .cell .tigers,
-#game .cell .grass,
-#game .cell .food {
+#b-game #b-game__plain .cell .ground,
+#b-game #b-game__plain .cell .death,
+#b-game #b-game__plain .cell .cows,
+#b-game #b-game__plain .cell .tigers,
+#b-game #b-game__plain .cell .grass,
+#b-game #b-game__plain .cell .food {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -77,28 +78,58 @@ html {
     top: 0;
     left: 0;
 }
-
-#game .cell .ground {
+#b-game #b-game__plain .cell .ground {
     background: url('../img/ground.jpeg')center;
     background-size: cover;
 }
-#game .cell .cows {
+#b-game #b-game__plain .cell .cows {
     background: url('../img/cow.png')center;
     background-size: cover;
 }
-#game .cell .tigers {
+#b-game #b-game__plain .cell .tigers {
     background: url('../img/tiger.png')center;
     background-size: cover;
 }
-#game .cell .grass {
+#b-game #b-game__plain .cell .grass {
     background: url('../img/grass.jpeg')center;
     background-size: cover;
 }
-#game .cell .food {
+#b-game #b-game__plain .cell .food {
     background: url('../img/burger.png')center;
     background-size: cover;
 }
-#game .cell .death {
+#b-game #b-game__plain .cell .death {
     background: url('../img/rip.png')center;
     background-size: cover;
+}
+
+/*BLOCK FOOTER*/
+#b-footer {
+    display: flex;
+    flex-flow: row nowrap;
+    align-content: center;
+}
+
+#b-footer .b-footer__github {
+    
+}
+#b-footer .b-footer__github .b-github {
+    display: flex;
+    flex-flow: row nowrap;
+    align-content: center;
+    align-items: center;
+    padding: 2px 5px;
+}
+#b-footer .b-footer__github .b-github:hover {
+    background: #424242;
+}
+#b-footer .b-footer__github .b-github .b-github__img {
+    
+}
+#b-footer .b-footer__github .b-github .b-github__link {
+    color: #a7a4a4;
+    text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.9);
+    text-decoration: none;
+    align-self: center;
+    align-content: center;
 }

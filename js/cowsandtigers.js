@@ -57,7 +57,7 @@ var cowsandtigers = (function () {
      */
     function Scene(setting) {
         this.gameContainer = document.getElementById(setting.gameContainerID);
-        this.plain = document.getElementById('plain');
+        this.plain = document.getElementById('b-game__plain');
         this.map = new Map(setting);
     }
 
