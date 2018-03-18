@@ -35,13 +35,14 @@ var cowsandtigers = (function () {
     Game.prototype.run = function () {
         // Создадим игровое поле на сцене
         this.scene.build();
+        var self = this;
 
         if (!devMode) {
             // Главный Loop
-            setInterval(() => {
-                this.scene.actionOnMap();
-                this.scene.render();
-            }, this.timeRender);
+            setInterval(function () {
+                self.scene.actionOnMap();
+                self.scene.render();
+            }, self.timeRender);
         } else {
             this.scene.actionOnMap();
             this.scene.render();
@@ -106,7 +107,6 @@ var cowsandtigers = (function () {
      * Действия всех объектов на карте
      */
     Scene.prototype.actionOnMap = function () {
-        console.log("Show action on Map in one time");
         for (var i = 0; i < this.map.objectsOnMap.length; i++) {
             this.map.objectsOnMap[i].action(this.map);
         }
@@ -144,7 +144,8 @@ var cowsandtigers = (function () {
 
         var objID = 0;
 
-        for(var objectName in this.mapObjects ) {
+        for(var objectName in this.mapObjects) {
+
             var isStaticObject = false;
 
             var objMin = this.mapObjects[objectName].min;
@@ -172,8 +173,10 @@ var cowsandtigers = (function () {
 
                 // console.log('mapRowColNormal: ', mapRowCol);
 
-                if (this.mapData[mapRowCol.row][mapRowCol.col] == undefined) {
+                if (this.mapData[mapRowCol.row][mapRowCol.col] === undefined) {
+                    
                     var unit = new Unit(objectName, objID, mapRowCol.row, mapRowCol.col);
+
 
                     this.mapData[mapRowCol.row][mapRowCol.col] = unit;
 
@@ -213,7 +216,7 @@ var cowsandtigers = (function () {
 
             // console.log('mapRowColRecursive: ', mapRowCol);
 
-            if (this.mapData[mapRowCol.row][mapRowCol.col] == undefined) {
+            if (this.mapData[mapRowCol.row][mapRowCol.col] === undefined) {
                 var unit = new Unit(objectSetting.objectName, objectSetting.objID, mapRowCol.row, mapRowCol.col);
 
                 this.mapData[mapRowCol.row][mapRowCol.col] = unit;
@@ -250,13 +253,18 @@ var cowsandtigers = (function () {
     };
 
 
-    Map.prototype.set = function (unit, newUnit) {
-        this.mapData[unit.positionRow][unit.positionCol] = newUnit;
+    Map.prototype.setCell = function (cell, newUnit) {
+        // this.mapData[cell.positionRow][cell.positionCol] = newUnit;
+        console.log(newUnit);
+        
+        this.mapData[cell.positionRow][cell.positionCol] = newUnit;
+        
+        newUnit.updateRowCol(cell);
     }
 
 
-    Map.prototype.get = function (unit) {
-        return this.mapData[unit.positionRow][unit.positionCol];
+    Map.prototype.getCell = function (row,col) {
+        return this.mapData[row][col];
     }
     // ------------------------------------------
 
@@ -272,10 +280,11 @@ var cowsandtigers = (function () {
     function Unit(className, id, objPositionRow, objPositionCol) {
         this.id = id;
         this.className = className;
-        this.positionRow = objPositionCol;
-        this.positionCol = objPositionRow;
+        this.positionRow = objPositionRow;
+        this.positionCol = objPositionCol;
         this.foodType = this.getFoodType();
         this.health = 100;
+        this.enemy = (className == 'cows' ? 'tigers' : null);
 
         // Выберим алгоритм поведения для объекта
         this.algoritms = this.selectAlgorithm(this) || {};
@@ -350,6 +359,12 @@ var cowsandtigers = (function () {
                 break;
         }
     };
+
+
+    Unit.prototype.updateRowCol = function (cell) {
+        this.positionRow = cell.positionRow;
+        this.positionCol = cell.positionCol;
+    }
     // ------------------------------------------
 
 
@@ -375,153 +390,173 @@ var cowsandtigers = (function () {
         //  Направление выберим произвольно исключая направления хищника, если он есть.
 
         // Проверим соседнии клетки
-        this.neighboringsCell = this.checkUnitNeighboringsCell(map);
+        var neighboringsCell = this.checkUnitNeighboringsCell(map);
 
-        // Посмотрим есть ли вокруг еда
-        var neighboringsCellWithFood = this.hasFood(this.neighboringsCell);
+        // Проверим вокруг еду
+        // Если есть, вернет массив, иначе пустой массив
+        var neighboringsCellWithFood = this.hasFood(neighboringsCell);
 
-        if (neighboringsCellWithFood) {
-            console.log(neighboringsCellWithFood);
-            this.move(map);
+        // Проверим вокруг врагов(тигров)
+        var neighboringsCellWithEnemies = this.hasEnemy(neighboringsCell);
+
+        var data = {
+            map: map,
+            neighboringsCell: neighboringsCell,
+            neighboringsCellWithFood: neighboringsCellWithFood,
+            neighboringsCellWithEnemies: neighboringsCellWithEnemies
         }
+
+        // Все необходимые данные полученны, сделаем ход
+        this.move(data);
     };
 
     // Проверим соседнии клетки +
     Algorithm.prototype.checkUnitNeighboringsCell = function (map) {
-        var unitPositionRow = parseInt(this.unit.positionRow);
-        var unitPositionCol = parseInt(this.unit.positionCol);
-        var mapDate = map.mapData;
+        if (
+            this.unit.className == 'tigers'
+            ||
+            this.unit.className == 'cows'
+        ) {
 
-        // Не забыть про границы карты
-        var border = {
-            top: 0,
-            topRight: map.col,
-            right: map.col,
-            rightBottom: map.col,
-            bottom: map.row,
-            leftBottom: 0,
-            left: 0,
-            leftTop: 0
-        }
+            var cells = [
+                {
+                    direction: 'top',
+                    exist: false,
+                    content: ''
+                },
+                {
+                    direction: 'topRight',
+                    exist: false,
+                    content: ''
+                },
+                {
+                    direction: 'right',
+                    exist: false,
+                    content: ''
+                },
+                {
+                    direction: 'rightBottom',
+                    exist: false,
+                    content: ''
+                },
+                {
+                    direction: 'bottom',
+                    exist: false,
+                    content: ''
+                },
+                {
+                    direction: 'leftBottom',
+                    exist: false,
+                    content: ''
+                },
+                {
+                    direction: 'left',
+                    exist: false,
+                    content: ''
+                },
+                {
+                    direction: 'leftTop',
+                    exist: false,
+                    content: ''
+                }
+            ];
 
-        var cells = [
-            {
-                direction: 'top',
-                exist: false,
-                content: ''
-            },
-            {
-                direction: 'topRight',
-                exist: false,
-                content: ''
-            },
-            {
-                direction: 'right',
-                exist: false,
-                content: ''
-            },
-            {
-                direction: 'rightBottom',
-                exist: false,
-                content: ''
-            },
-            {
-                direction: 'bottom',
-                exist: false,
-                content: ''
-            },
-            {
-                direction: 'leftBottom',
-                exist: false,
-                content: ''
-            },
-            {
-                direction: 'left',
-                exist: false,
-                content: ''
-            },
-            {
-                direction: 'leftTop',
-                exist: false,
-                content: ''
+            var unitPositionRow = parseInt(this.unit.positionRow);
+            var unitPositionCol = parseInt(this.unit.positionCol);
+            var mapDate = map.mapData;
+
+            // Не забыть про границы карты
+            var border = {
+                top: 0,
+                topRight: map.col,
+                right: map.col,
+                rightBottom: map.col,
+                bottom: map.row,
+                leftBottom: 0,
+                left: 0,
+                leftTop: 0
             }
-        ];
+            // console.log(mapDate);
+            // console.log("PL:", unitPositionRow, unitPositionCol);
 
-        // TOP Проверим ячейку с вверху +
-        if ((unitPositionRow - 1) >= border.top) {
-            cells[0].exist = true;
-            cells[0].content = mapDate[unitPositionRow - 1][unitPositionCol];
+            // TOP Проверим ячейку с вверху +
+            if ((unitPositionRow - 1) >= border.top) {
+                cells[0].exist = true;
+                cells[0].content = mapDate[unitPositionRow - 1][unitPositionCol];
+            }
+
+
+            // TOP_RIGHT Проверим ячейку с вверху-вправо +
+            if (
+                (unitPositionRow - 1) >= border.top
+                && (unitPositionCol + 1) < border.topRight
+            ) {
+                cells[1].exist = true;
+                cells[1].content = mapDate[unitPositionRow - 1][unitPositionCol + 1];
+            }
+
+
+            // RIGHT Проверим ячейку с вправо +
+            if ((unitPositionCol + 1) < border.right) {
+                cells[2].exist = true;
+                cells[2].content = mapDate[unitPositionRow][unitPositionCol + 1];
+            }
+
+
+            // RIGHT_BOTTOM Проверим ячейку с вправо-внизу +
+            if (
+                (unitPositionRow + 1) < border.bottom
+                &&
+                (unitPositionCol + 1) < border.rightBottom
+            ) {
+                cells[3].exist = true;
+                cells[3].content = mapDate[unitPositionRow + 1][unitPositionCol + 1];
+            }
+
+
+            // BOTTOM Проверим ячейку внизу +
+            if ((unitPositionRow + 1) < border.bottom) {
+                cells[4].exist = true;
+                cells[4].content = mapDate[unitPositionRow + 1][unitPositionCol];
+            }
+
+
+            // LEFT_BOTTOM Проверим ячейку с слева-внизу +
+            if (
+                (unitPositionRow + 1) < border.bottom
+                &&
+                (unitPositionCol - 1) >= border.leftBottom
+            ) {
+                cells[5].exist = true;
+                cells[5].content = mapDate[unitPositionRow + 1][unitPositionCol - 1];
+            }
+
+
+            // LEFT Проверим ячейку с слева +
+            if ((unitPositionCol - 1) >= border.left) {
+                cells[6].exist = true;
+                cells[6].content = mapDate[unitPositionRow][unitPositionCol - 1];
+            }
+
+
+            // LEFT_TOP Проверим ячейку с лева-вверху +
+            if (
+                (unitPositionRow - 1) >= border.top
+                &&
+                (unitPositionCol - 1) >= border.left
+            ) {
+                cells[7].exist = true;
+                cells[7].content = mapDate[unitPositionRow - 1][unitPositionCol - 1];
+            }
+
+            // console.log(this.unit);
+            // console.log(cells);
+            // console.log("ROW: " + unitPositionRow, "COL: " + unitPositionCol );
+
+            return cells;
+        } else {
+            return false;
         }
-
-
-        // TOP_RIGHT Проверим ячейку с вверху-вправо +
-        if (
-            (unitPositionRow - 1 ) >= border.top
-            && (unitPositionCol + 1) < border.topRight
-        ) {
-            cells[1].exist = true;
-            cells[1].content = mapDate[unitPositionRow - 1][unitPositionCol + 1];
-        }
-
-
-        // RIGHT Проверим ячейку с вправо +
-        if ((unitPositionCol + 1 ) < border.right) {
-            cells[2].exist = true;
-            cells[2].content = mapDate[unitPositionRow][unitPositionCol + 1];
-        }
-
-
-        // RIGHT_BOTTOM Проверим ячейку с вправо-внизу +
-        if (
-            (unitPositionRow + 1 ) < border.bottom
-            &&
-            (unitPositionCol + 1) <  border.rightBottom
-        ) {
-            cells[3].exist = true;
-            cells[3].content = mapDate[unitPositionRow + 1][unitPositionCol + 1];
-        }
-
-        
-        // BOTTOM Проверим ячейку внизу +
-        if ((unitPositionRow + 1) <  border.bottom) {
-            cells[4].exist = true;
-            cells[4].content = mapDate[unitPositionRow + 1][unitPositionCol];
-        }
-
-
-        // LEFT_BOTTOM Проверим ячейку с слева-внизу +
-        if (
-            (unitPositionRow + 1 ) < border.bottom
-            &&
-            (unitPositionCol - 1) >=  border.leftBottom
-        ) {
-            cells[5].exist = true;
-            cells[5].content = mapDate[unitPositionRow + 1][unitPositionCol - 1];
-        }
-
-
-        // LEFT Проверим ячейку с слева +
-        if ((unitPositionCol - 1 ) >= border.left) {
-            cells[6].exist = true;
-            cells[6].content = mapDate[unitPositionRow][unitPositionCol - 1];
-        }
-
-
-        // LEFT_TOP Проверим ячейку с лева-вверху +
-        if (
-            (unitPositionRow - 1 ) >= border.top
-            &&
-            (unitPositionCol - 1 ) >= border.left
-        ) {
-            cells[7].exist = true;
-            cells[7].content = mapDate[unitPositionRow - 1][unitPositionCol - 1];
-        }
-
-        // console.log(this.unit);
-        // console.log(cells);
-        // console.log("ROW: " + unitPositionRow, "COL: " + unitPositionCol );
-
-        return cells;
     };
 
 
@@ -532,12 +567,12 @@ var cowsandtigers = (function () {
      * @returns {*}
      */
     Algorithm.prototype.hasFood = function (neighboringsCell) {
-        var foodType =  this.unit.foodType;
-        
-        console.log(this.unit.className);
-        
-        if (foodType !== null) {
 
+        if (this.unit.foodType !== null) {
+
+            // console.log("CLASSNAME: " + this.unit.className, "ROW: " + this.unit.positionRow, "COL: " + this.unit.positionCol);
+            // console.log(neighboringsCell);
+            
             var foodTypeRowCol = [];
 
             // Переберем полученный массив с ячейками находящимися рядом
@@ -546,12 +581,10 @@ var cowsandtigers = (function () {
                 // Ячейка не выходит за границы
                 if (neighboringsCell[i].exist) {
 
-                    console.log(foodType);
-                    //
-                    if (neighboringsCell[i].content.className == foodType) {
+                    if (neighboringsCell[i].content.className == this.unit.foodType) {
                         foodTypeRowCol.push(
                             {
-                                foodType: foodType,
+                                foodType: this.unit.foodType,
                                 foodRow: neighboringsCell[i].content.positionRow,
                                 foodCol: neighboringsCell[i].content.positionCol
                             }
@@ -559,23 +592,66 @@ var cowsandtigers = (function () {
                     }
                 }
             }
+            // console.log(foodTypeRowCol);
             return foodTypeRowCol;
         }
 
         return false;
     };
 
-    Algorithm.prototype.hasEnemy = function (map) {
+    Algorithm.prototype.hasEnemy = function (neighboringsCell) {
+        if (this.unit.enemy !== null) {
+            
+            var enemyRowCol = [];
+
+            // Переберем полученный массив с ячейками находящимися рядом
+            for (var i = 0; i < neighboringsCell.length; i++) {
+
+                // Ячейка не выходит за границы
+                if (neighboringsCell[i].exist) {
+
+                    if (neighboringsCell[i].content.className == this.unit.enemy) {
+                        enemyRowCol.push(
+                            {
+                                foodType: this.unit.enemy,
+                                foodRow: neighboringsCell[i].content.positionRow,
+                                foodCol: neighboringsCell[i].content.positionCol
+                            }
+                        );
+                    }
+                }
+            }
+            // console.log(foodTypeRowCol);
+            return enemyRowCol;
+        }
+
+        return false;
 
     };
 
 
-    Algorithm.prototype.move = function (map) {
-        console.log("Algorithm work");
-
-    //    Временно сделаем
+    Algorithm.prototype.move = function (data) {
+        // console.log("Algorithm work: " + this.unit.className);
+        //
+        // console.log(map, neighboringsCellWithFood, neighboringsCellWithEnemies);
 
     };
+
+
+    Algorithm.prototype.makeAMove = function (map, row,col) {
+
+        // Сохраним старый Unit
+        var oldCell = this.unit;
+        // Получим новый Unit
+        var newCell = map.getCell(row,col);
+
+
+        // На место старого Unit поставим траву
+        map.setCell(oldCell, new Unit("ground", 3, oldCell.positionRow, oldCell.positionCol));
+        // Для старого Unit зададим новые Row/Col
+        map.setCell(newCell, this.unit);
+    }
+
     // ------------------------------------------
     
     // COWS ALGORITM
@@ -586,12 +662,59 @@ var cowsandtigers = (function () {
     CowsAlgorithm.constructor = 'CowsAlgorithm';
 
 
-    CowsAlgorithm.prototype.move = function (map) {
-        // console.log("Algorithm work: " + this.unit.className);
+    CowsAlgorithm.prototype.move = function (data) {
+        console.log("Algorithm work: " + this.unit.className);
 
-        // console.log(this.neighboringsCell);
+        // console.log(data);
+
+        // Массив с картой              - data.map
+        // Массив с соседними клетками  - data.neighboringsCell
+        // Массив с травой              - data.neighboringsCellWithFood
+        // Массив с тиграми             - data.neighboringsCellWithEnemies
+
+
+        if (data.neighboringsCellWithFood.length > 0) {
+
+            var cellFoodRandomRowCol = tools.randomInteger(0, data.neighboringsCellWithFood.length - 1);
+
+            var row = data.neighboringsCellWithFood[cellFoodRandomRowCol].foodRow;
+            var col = data.neighboringsCellWithFood[cellFoodRandomRowCol].foodCol;
+
+            this.makeAMove(data.map, row,col);
+        }
+        // else {
+        //     this.makeASimpleMove(data.map, data.neighboringsCell);
+        // }
 
     };
+
+    CowsAlgorithm.prototype.makeASimpleMove = function (map, neighboringsCell) {
+        
+
+        for (var cell in neighboringsCell ) {
+
+            if (
+                neighboringsCell[cell].exist
+                &&
+                neighboringsCell[cell].className != 'tigers'
+            ) {
+
+                console.log(neighboringsCell[cell]);
+                
+                // Сохраним старый Unit
+                var oldCell = this;
+
+                // На место старого Unit поставим траву
+                map.setCell(oldCell, new Unit("ground", 3, oldCell.positionRow, oldCell.positionCol));
+
+                console.log(neighboringsCell[cell].content);
+
+                // Для старого Unit зададим новые Row/Col
+                map.setCell(neighboringsCell[cell].content, this);
+
+            }
+        }
+    }
     // ------------------------------------------
 
     // TIGERS ALGORITM
@@ -600,6 +723,13 @@ var cowsandtigers = (function () {
     }
     TigersAlgorithm.prototype = new Algorithm();
     TigersAlgorithm.constructor = 'TigersAlgorithm';
+
+
+    TigersAlgorithm.prototype.move = function (data) {
+        console.log("Algorithm work: " + this.unit.className);
+
+        console.log(data);
+    };
     // ------------------------------------------
 
     // GRASS ALGORITM
