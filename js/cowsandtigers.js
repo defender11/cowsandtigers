@@ -286,6 +286,8 @@ var cowsandtigers = (function () {
         this.health = 100;
         this.enemy = (className == 'cows' ? 'tigers' : null);
 
+        this.soundEat = new GameSounds("audio/eat_" + this.className + ".mp3");
+
         // Выберим алгоритм поведения для объекта
         this.algoritms = this.selectAlgorithm(this) || {};
     }
@@ -650,6 +652,7 @@ var cowsandtigers = (function () {
         map.setCell(oldCell, new Unit("ground", 3, oldCell.positionRow, oldCell.positionCol));
         // Для старого Unit зададим новые Row/Col
         map.setCell(newCell, this.unit);
+
     }
 
     // ------------------------------------------
@@ -665,13 +668,12 @@ var cowsandtigers = (function () {
     CowsAlgorithm.prototype.move = function (data) {
         console.log("Algorithm work: " + this.unit.className);
 
-        // console.log(data);
-
         // Массив с картой              - data.map
         // Массив с соседними клетками  - data.neighboringsCell
         // Массив с травой              - data.neighboringsCellWithFood
         // Массив с тиграми             - data.neighboringsCellWithEnemies
 
+        this.unit.soundEat.stop();
 
         if (data.neighboringsCellWithFood.length > 0) {
 
@@ -681,7 +683,10 @@ var cowsandtigers = (function () {
             var col = data.neighboringsCellWithFood[cellFoodRandomRowCol].foodCol;
 
             this.makeAMove(data.map, row,col);
+
+            this.unit.soundEat.play();
         }
+
         // else {
         //     this.makeASimpleMove(data.map, data.neighboringsCell);
         // }
@@ -754,6 +759,22 @@ var cowsandtigers = (function () {
     }
     DeathAlgorithm.prototype = new Algorithm();
     DeathAlgorithm.constructor = 'DeathAlgorithm';
+    // ------------------------------------------
+
+    // AUDIO IN GAME
+    function GameSounds(file) {
+        this.sound = new Audio(file);
+    }
+    GameSounds.prototype = new Audio();
+    GameSounds.constructor = "GameSounds";
+    GameSounds.prototype.play = function () {
+        this.sound.play();
+    }
+    // Функция stop для Audio:
+    GameSounds.prototype.stop = function() {
+        this.sound.pause();
+        this.sound.currentTime = 0.0;
+    }
     // ------------------------------------------
 
     // Вспомогательные функции для игры
