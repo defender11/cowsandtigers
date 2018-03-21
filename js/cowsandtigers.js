@@ -35,6 +35,7 @@ var cowsandtigers = (function () {
     Game.prototype.run = function () {
         // Создадим игровое поле на сцене
         this.scene.build();
+        // return false;
         var self = this;
 
         if (!devMode) {
@@ -107,8 +108,18 @@ var cowsandtigers = (function () {
      * Действия всех объектов на карте
      */
     Scene.prototype.actionOnMap = function () {
-        for (var i = 0; i < this.map.objectsOnMap.length; i++) {
-            this.map.objectsOnMap[i].action(this.map);
+        console.log(this.map.objectsOnMap);
+
+        for (var indexObject = 0; indexObject < this.map.objectsOnMap.length; indexObject++) {
+
+            // if (this.map.objectsOnMap[indexObject].className == "cows") {
+
+                var unit = this.map.objectsOnMap[indexObject];
+
+                unit.action(this.map, indexObject);
+
+
+            // }
         }
     };
     // ------------------------------------------
@@ -157,14 +168,12 @@ var cowsandtigers = (function () {
             if (objMin === null && objMax === null) {
                 objMin = (this.row + this.col) * 2;
                 objMax = (this.row + this.col) * 100;
-
-                isStaticObject = true;
             }
 
             // Получим кол-во объектов на карте
             var objCountOnMap = tools.randomInteger(objMin, objMax);
 
-            // console.log(objCountOnMap);
+            console.log("objectName[objCountOnMap]: " + objectName + " " + objCountOnMap);
 
             // Пройдемся по этому количевству
             for (var i = 0; i < objCountOnMap; i++) {
@@ -173,21 +182,19 @@ var cowsandtigers = (function () {
 
                 // console.log('mapRowColNormal: ', mapRowCol);
 
-                if (this.mapData[mapRowCol.row][mapRowCol.col] === undefined) {
-                    
-                    var unit = new Unit(objectName, objID, mapRowCol.row, mapRowCol.col);
+                if (!this.mapData[mapRowCol.row][mapRowCol.col]) {
 
+                    var unit = new Unit(objectName, objID, mapRowCol.row, mapRowCol.col);
 
                     this.mapData[mapRowCol.row][mapRowCol.col] = unit;
 
-                    if (!isStaticObject) {
+                    if (objectName == 'cows' || objectName == 'tigers') {
                         this.objectsOnMap.push(unit);
                     }
                 } else {
                     var unitSetting = {
                         objID: objID,
-                        objectName: objectName,
-                        isStaticObject: isStaticObject
+                        objectName: objectName
                     };
                     this.tryNewGenerate(unitSetting, objCountOnMap);
                 }
@@ -221,16 +228,14 @@ var cowsandtigers = (function () {
 
                 this.mapData[mapRowCol.row][mapRowCol.col] = unit;
 
-                if (!objectSetting.isStaticObject) {
+                if (objectSetting.objectName == 'cows' || objectSetting.objectName == 'tigers') {
                     this.objectsOnMap.push(unit);
                 }
-
                 return false;
             } else {
                 var unitSetting = {
                     objID: objectSetting.objID,
-                    objectName: objectSetting.objectName,
-                    isStaticObject: objectSetting.isStaticObject
+                    objectName: objectSetting.objectName
                 };
                 return this.tryNewGenerate(unitSetting, count - 1);
             }
@@ -253,18 +258,24 @@ var cowsandtigers = (function () {
     };
 
 
-    Map.prototype.setCell = function (cell, newUnit) {
-        // this.mapData[cell.positionRow][cell.positionCol] = newUnit;
-        console.log(newUnit);
-        
-        this.mapData[cell.positionRow][cell.positionCol] = newUnit;
-        
-        newUnit.updateRowCol(cell);
+    Map.prototype.setCell = function (oldUnit, newUnit, indexObject) {
+
+        this.mapData[oldUnit.positionRow][oldUnit.positionCol] = newUnit;
+
+        newUnit.updateRowCol(oldUnit);
+
+        this.objectsOnMap[indexObject].positionRow = oldUnit.positionRow;
+        this.objectsOnMap[indexObject].positionCol = oldUnit.positionCol;
     }
 
 
     Map.prototype.getCell = function (row,col) {
         return this.mapData[row][col];
+    }
+
+
+    Map.prototype.removeObjectsOnMap = function (indexObject) {
+        this.objectsOnMap.splice(indexObject, 1);
     }
     // ------------------------------------------
 
@@ -289,7 +300,7 @@ var cowsandtigers = (function () {
         this.soundEat = new GameSounds("audio/eat_" + this.className + ".mp3");
 
         // Выберим алгоритм поведения для объекта
-        this.algoritms = this.selectAlgorithm(this) || {};
+        this.algoritms = this.selectAlgorithm() || {};
     }
 
 
@@ -298,16 +309,47 @@ var cowsandtigers = (function () {
      * @returns {string}
      */
     Unit.prototype.show = function () {
-        return "<div class='"+this.className+"'></div>";
+        var unitHealth = "";
+
+        if (this.className == 'cows' || this.className == 'tigers') {
+            var healthColor = this.getHealthColor(this.health);
+
+
+            unitHealth += "<div class='b-unit__health'>"
+                + "<div class='b-healt__indicator' style='width: "+this.health+"%; "+healthColor+"'></div>"
+                + "</div>";
+        }
+
+        return "<div class='b-unit "+this.className+"'>" + unitHealth + "</div>";
     };
 
+
+    Unit.prototype.getHealthColor = function (value) {
+
+        if (parseInt(value) >= 90 && parseInt(value) <= 100) {
+            return "background: #84c700;";
+        }
+        if (parseInt(value) >= 75 && parseInt(value) <= 90) {
+            return "background: #ce7900;";
+        }
+        if (parseInt(value) >= 50 && parseInt(value) <= 75) {
+            return "background: #c6cd2e;";
+        }
+        if (parseInt(value) >= 25 && parseInt(value) <= 50) {
+            return "background: #ce4c2e;";
+        }
+        if (parseInt(value) >= 0 && parseInt(value) <= 25) {
+            return "background: #transparent;";
+        }
+
+    };
 
     /**
      * Разные действия объекта
      */
-    Unit.prototype.action = function (map) {
+    Unit.prototype.action = function (map, indexObject) {
         if (this.algoritms) {
-            this.algoritms.action(map);
+            this.algoritms.action(this, map, indexObject);
         }
     };
 
@@ -345,19 +387,19 @@ var cowsandtigers = (function () {
 
         switch (parseInt(this.id)) {
             case 0:
-                return new GrassAlgorithm(this);
+                return new GrassAlgorithm();
                 break;
             case 1:
-                return new CowsAlgorithm(this);
+                return new CowsAlgorithm();
                 break;
             case 2:
-                return new TigersAlgorithm(this);
+                return new TigersAlgorithm();
                 break;
             case 3:
-                return new GroundAlgorithm(this);
+                return new GroundAlgorithm();
                 break;
             case 4:
-                return new DeathAlgorithm(this);
+                return new DeathAlgorithm();
                 break;
         }
     };
@@ -374,97 +416,89 @@ var cowsandtigers = (function () {
      * Агоритм повидения объектов
      * @constructor
      */
-    function Algorithm (unit) {
-        this.unit = unit;
-        this.neighboringCells = null;
+    function Algorithm () {
+        this.addHealth = 10;
+        this.subHealth = 5;
     }
 
     // Главный мотиватор действий в игре
-    Algorithm.prototype.action = function (map) {
-
-        // Осмотримся
-        // - Проверим соседнии клетки:
-        //      - На границы карты
-        //      - На хищников
-        //      - На еду
-        //  Если в соседней клетки есть еда, то она становиться приоритетом
-        //  Если еды нет, но есть хищник, то бежим от него.
-        //  Направление выберим произвольно исключая направления хищника, если он есть.
+    Algorithm.prototype.action = function (unit, map, indexObject) {
 
         // Проверим соседнии клетки
-        var neighboringsCell = this.checkUnitNeighboringsCell(map);
+        var neighboringsCell = this.checkUnitNeighboringsCell(map, unit);
 
         // Проверим вокруг еду
         // Если есть, вернет массив, иначе пустой массив
-        var neighboringsCellWithFood = this.hasFood(neighboringsCell);
+        var neighboringsCellWithFood = this.hasFood(neighboringsCell, unit);
 
         // Проверим вокруг врагов(тигров)
-        var neighboringsCellWithEnemies = this.hasEnemy(neighboringsCell);
+        var neighboringsCellWithEnemies = this.hasEnemy(neighboringsCell, unit);
 
         var data = {
             map: map,
+            unit: unit,
             neighboringsCell: neighboringsCell,
             neighboringsCellWithFood: neighboringsCellWithFood,
             neighboringsCellWithEnemies: neighboringsCellWithEnemies
         }
 
         // Все необходимые данные полученны, сделаем ход
-        this.move(data);
+        this.move(data, indexObject);
     };
 
     // Проверим соседнии клетки +
-    Algorithm.prototype.checkUnitNeighboringsCell = function (map) {
+    Algorithm.prototype.checkUnitNeighboringsCell = function (map, unit) {
         if (
-            this.unit.className == 'tigers'
+            unit.className == 'tigers'
             ||
-            this.unit.className == 'cows'
+            unit.className == 'cows'
         ) {
 
             var cells = [
                 {
                     direction: 'top',
                     exist: false,
-                    content: ''
+                    content: null
                 },
                 {
                     direction: 'topRight',
                     exist: false,
-                    content: ''
+                    content: null
                 },
                 {
                     direction: 'right',
                     exist: false,
-                    content: ''
+                    content: null
                 },
                 {
                     direction: 'rightBottom',
                     exist: false,
-                    content: ''
+                    content: null
                 },
                 {
                     direction: 'bottom',
                     exist: false,
-                    content: ''
+                    content: null
                 },
                 {
                     direction: 'leftBottom',
                     exist: false,
-                    content: ''
+                    content: null
                 },
                 {
                     direction: 'left',
                     exist: false,
-                    content: ''
+                    content: null
                 },
                 {
                     direction: 'leftTop',
                     exist: false,
-                    content: ''
+                    content: null
                 }
             ];
 
-            var unitPositionRow = parseInt(this.unit.positionRow);
-            var unitPositionCol = parseInt(this.unit.positionCol);
+            var unitPositionRow = parseInt(unit.positionRow);
+            var unitPositionCol = parseInt(unit.positionCol);
             var mapDate = map.mapData;
 
             // Не забыть про границы карты
@@ -568,14 +602,14 @@ var cowsandtigers = (function () {
      * @param foodType
      * @returns {*}
      */
-    Algorithm.prototype.hasFood = function (neighboringsCell) {
+    Algorithm.prototype.hasFood = function (neighboringsCell, unit) {
 
-        if (this.unit.foodType !== null) {
+        if (unit.foodType !== null) {
 
             // console.log("CLASSNAME: " + this.unit.className, "ROW: " + this.unit.positionRow, "COL: " + this.unit.positionCol);
             // console.log(neighboringsCell);
             
-            var foodTypeRowCol = [];
+            var foodsArr = [];
 
             // Переберем полученный массив с ячейками находящимися рядом
             for (var i = 0; i < neighboringsCell.length; i++) {
@@ -583,28 +617,30 @@ var cowsandtigers = (function () {
                 // Ячейка не выходит за границы
                 if (neighboringsCell[i].exist) {
 
-                    if (neighboringsCell[i].content.className == this.unit.foodType) {
-                        foodTypeRowCol.push(
-                            {
-                                foodType: this.unit.foodType,
-                                foodRow: neighboringsCell[i].content.positionRow,
-                                foodCol: neighboringsCell[i].content.positionCol
-                            }
-                        );
+                    if (neighboringsCell[i].content.className !== null) {
+                        if (neighboringsCell[i].content.className == unit.foodType) {
+                            foodsArr.push(
+                                {
+                                    foodType: unit.foodType,
+                                    foodRow: neighboringsCell[i].content.positionRow,
+                                    foodCol: neighboringsCell[i].content.positionCol
+                                }
+                            );
+                        }
                     }
+
                 }
             }
-            // console.log(foodTypeRowCol);
-            return foodTypeRowCol;
+            return foodsArr;
         }
 
         return false;
     };
 
-    Algorithm.prototype.hasEnemy = function (neighboringsCell) {
-        if (this.unit.enemy !== null) {
+    Algorithm.prototype.hasEnemy = function (neighboringsCell, unit) {
+        if (unit.enemy !== null) {
             
-            var enemyRowCol = [];
+            var enemiesArr = [];
 
             // Переберем полученный массив с ячейками находящимися рядом
             for (var i = 0; i < neighboringsCell.length; i++) {
@@ -612,10 +648,10 @@ var cowsandtigers = (function () {
                 // Ячейка не выходит за границы
                 if (neighboringsCell[i].exist) {
 
-                    if (neighboringsCell[i].content.className == this.unit.enemy) {
-                        enemyRowCol.push(
+                    if (neighboringsCell[i].content.className == unit.enemy) {
+                        enemiesArr.push(
                             {
-                                foodType: this.unit.enemy,
+                                foodType: unit.enemy,
                                 foodRow: neighboringsCell[i].content.positionRow,
                                 foodCol: neighboringsCell[i].content.positionCol
                             }
@@ -623,8 +659,7 @@ var cowsandtigers = (function () {
                     }
                 }
             }
-            // console.log(foodTypeRowCol);
-            return enemyRowCol;
+            return enemiesArr;
         }
 
         return false;
@@ -632,131 +667,199 @@ var cowsandtigers = (function () {
     };
 
 
-    Algorithm.prototype.move = function (data) {
-        // console.log("Algorithm work: " + this.unit.className);
-        //
-        // console.log(map, neighboringsCellWithFood, neighboringsCellWithEnemies);
-
-    };
-
-
-    Algorithm.prototype.makeAMove = function (map, row,col) {
+    Algorithm.prototype.makeAMove = function (map, indexObject, unit, row, col) {
 
         // Сохраним старый Unit
-        var oldCell = this.unit;
+        var oldUnit = unit;
         // Получим новый Unit
         var newCell = map.getCell(row,col);
 
-
         // На место старого Unit поставим траву
-        map.setCell(oldCell, new Unit("ground", 3, oldCell.positionRow, oldCell.positionCol));
+        map.setCell(oldUnit, new Unit("ground", 3, oldUnit.positionRow, oldUnit.positionCol), indexObject);
+
         // Для старого Unit зададим новые Row/Col
-        map.setCell(newCell, this.unit);
+        map.setCell(newCell, unit, indexObject);
 
     }
 
     // ------------------------------------------
     
     // COWS ALGORITM
-    function CowsAlgorithm(unit) {
-        Algorithm.call(this, unit);
-    }
+    function CowsAlgorithm() {}
     CowsAlgorithm.prototype = new Algorithm();
     CowsAlgorithm.constructor = 'CowsAlgorithm';
 
 
-    CowsAlgorithm.prototype.move = function (data) {
-        console.log("Algorithm work: " + this.unit.className);
+    CowsAlgorithm.prototype.move = function (data, indexObject) {
 
         // Массив с картой              - data.map
         // Массив с соседними клетками  - data.neighboringsCell
         // Массив с травой              - data.neighboringsCellWithFood
         // Массив с тиграми             - data.neighboringsCellWithEnemies
 
-        this.unit.soundEat.stop();
+        if (data.unit.health != 0) {
+            if (data.neighboringsCellWithFood.length > 0) {
 
-        if (data.neighboringsCellWithFood.length > 0) {
+                data.unit.soundEat.stop();
 
-            var cellFoodRandomRowCol = tools.randomInteger(0, data.neighboringsCellWithFood.length - 1);
+                var cellFoodRandomRowCol = tools.randomInteger(0, data.neighboringsCellWithFood.length - 1);
 
-            var row = data.neighboringsCellWithFood[cellFoodRandomRowCol].foodRow;
-            var col = data.neighboringsCellWithFood[cellFoodRandomRowCol].foodCol;
+                var row = data.neighboringsCellWithFood[cellFoodRandomRowCol].foodRow;
+                var col = data.neighboringsCellWithFood[cellFoodRandomRowCol].foodCol;
 
-            this.makeAMove(data.map, row,col);
+                this.makeAMove(data.map, indexObject, data.unit, row, col);
 
-            this.unit.soundEat.play();
+                data.unit.soundEat.play();
+
+                if (data.unit.health < 100) {
+                    data.unit.health = data.unit.health + this.addHealth;
+                }
+
+            } else if (data.neighboringsCellWithEnemies.length > 0) {
+
+                this.makeASimpleMove(data.map, data.unit, data.neighboringsCell, indexObject);
+                data.unit.health = data.unit.health - this.subHealth;
+
+            } else {
+
+                this.makeASimpleMove(data.map, data.unit, data.neighboringsCell, indexObject);
+                data.unit.health = data.unit.health - this.subHealth;
+
+            }
+        } else {
+            data.map.removeObjectsOnMap(indexObject);
         }
-
-        // else {
-        //     this.makeASimpleMove(data.map, data.neighboringsCell);
-        // }
 
     };
 
-    CowsAlgorithm.prototype.makeASimpleMove = function (map, neighboringsCell) {
+    CowsAlgorithm.prototype.makeASimpleMove = function (map, unit, neighboringsCell, indexObject) {
         
+        // var cellRandomRowCol = tools.randomInteger(0, neighboringsCell.length - 1);
 
-        for (var cell in neighboringsCell ) {
+        // console.log(cellRandomRowCol);
+        // console.log("neighboringsCell: " + neighboringsCell[cellRandomRowCol].content.className);
+        // for (var cell in neighboringsCell ) {
+        //
+        //     if (neighboringsCell[cell].exist) {
+        //
+        //         if (neighboringsCell[cell].content.className === 'ground') {
+        //
+        //             // Сохраним старый Unit
+        //             var oldUnit = unit;
+        //
+        //             // На место старого Unit поставим траву
+        //             map.setCell(oldUnit, new Unit("ground", 3, oldUnit.positionRow, oldUnit.positionCol), indexObject);
+        //
+        //             // Для старого Unit зададим новые Row/Col
+        //             map.setCell(neighboringsCell[cell].content, oldUnit, indexObject);
+        //
+        //         }
+        //     }
+        // }
+            var cellRandomRowCol = tools.randomInteger(0, neighboringsCell.length - 1);
 
-            if (
-                neighboringsCell[cell].exist
-                &&
-                neighboringsCell[cell].className != 'tigers'
-            ) {
+            if (neighboringsCell[cellRandomRowCol].exist) {
 
-                console.log(neighboringsCell[cell]);
-                
-                // Сохраним старый Unit
-                var oldCell = this;
+                if (neighboringsCell[cellRandomRowCol].content.className === 'ground') {
 
-                // На место старого Unit поставим траву
-                map.setCell(oldCell, new Unit("ground", 3, oldCell.positionRow, oldCell.positionCol));
+                    // Сохраним старый Unit
+                    var oldUnit = unit;
 
-                console.log(neighboringsCell[cell].content);
+                    // На место старого Unit поставим траву
+                    map.setCell(oldUnit, new Unit("ground", 3, oldUnit.positionRow, oldUnit.positionCol), indexObject);
 
-                // Для старого Unit зададим новые Row/Col
-                map.setCell(neighboringsCell[cell].content, this);
+                    // Для старого Unit зададим новые Row/Col
+                    map.setCell(neighboringsCell[cellRandomRowCol].content, oldUnit, indexObject);
 
+
+                }
             }
-        }
+
+
     }
     // ------------------------------------------
 
     // TIGERS ALGORITM
-    function TigersAlgorithm(unit) {
-        Algorithm.call(this, unit);
-    }
+    function TigersAlgorithm() {}
     TigersAlgorithm.prototype = new Algorithm();
     TigersAlgorithm.constructor = 'TigersAlgorithm';
 
+    TigersAlgorithm.prototype.move = function (data, indexObject) {
 
-    TigersAlgorithm.prototype.move = function (data) {
-        console.log("Algorithm work: " + this.unit.className);
+        // Массив с картой              - data.map
+        // Массив с соседними клетками  - data.neighboringsCell
+        // Массив с травой              - data.neighboringsCellWithFood
+        // Массив с тиграми             - data.neighboringsCellWithEnemies
 
-        console.log(data);
+        if (data.unit.health != 0) {
+            if (data.neighboringsCellWithFood.length > 0) {
+
+                var cellFoodRandomRowCol = tools.randomInteger(0, data.neighboringsCellWithFood.length);
+                console.log(data.neighboringsCellWithFood);
+
+                var row = data.neighboringsCellWithFood[cellFoodRandomRowCol].foodRow;
+                var col = data.neighboringsCellWithFood[cellFoodRandomRowCol].foodCol;
+
+                this.makeAMove(data.map, indexObject, data.unit, row, col);
+
+                var unit = data.map.getCell(row, col);
+
+                // console.log(unit);
+                // data.unit.soundEat.play();
+
+                if (data.unit.health < 100) {
+                    data.unit.health = data.unit.health + this.addHealth;
+                }
+            } else {
+
+                this.makeASimpleMove(data.map, data.unit, data.neighboringsCell, indexObject);
+                data.unit.health = data.unit.health - this.subHealth;
+
+            }
+        } else {
+            data.map.removeObjectsOnMap(indexObject);
+        }
     };
+
+    TigersAlgorithm.prototype.makeASimpleMove = function (map, unit, neighboringsCell, indexObject) {
+
+
+            var cellRandomRowCol = tools.randomInteger(0, neighboringsCell.length - 1);
+
+            if (neighboringsCell[cellRandomRowCol].exist) {
+
+                if (neighboringsCell[cellRandomRowCol].content.className === 'ground') {
+
+                    // Сохраним старый Unit
+                    var oldUnit = unit;
+
+                    // На место старого Unit поставим траву
+                    map.setCell(oldUnit, new Unit("ground", 3, oldUnit.positionRow, oldUnit.positionCol), indexObject);
+
+                    // Для старого Unit зададим новые Row/Col
+                    map.setCell(neighboringsCell[cellRandomRowCol].content, oldUnit, indexObject);
+
+
+                }
+            }
+
+    }
     // ------------------------------------------
 
     // GRASS ALGORITM
-    function GrassAlgorithm(unit) {
-        Algorithm.call(this, unit);
-    }
+    function GrassAlgorithm() {}
     GrassAlgorithm.prototype = new Algorithm();
     GrassAlgorithm.constructor = 'GrassAlgorithm';
     // ------------------------------------------
 
     // GROUND ALGORITM
-    function GroundAlgorithm(unit) {
-        Algorithm.call(this, unit);
-    }
+    function GroundAlgorithm() {}
     GroundAlgorithm.prototype = new Algorithm();
     GroundAlgorithm.constructor = 'GroundAlgorithm';
     // ------------------------------------------
 
     // DEATH ALGORITM
-    function DeathAlgorithm(unit) {
-        Algorithm.call(this, unit);
-    }
+    function DeathAlgorithm() {}
     DeathAlgorithm.prototype = new Algorithm();
     DeathAlgorithm.constructor = 'DeathAlgorithm';
     // ------------------------------------------
