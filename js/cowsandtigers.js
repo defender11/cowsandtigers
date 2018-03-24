@@ -43,12 +43,11 @@ var cowsandtigers = (function () {
             setInterval(function () {
                 if (self.scene.issetObjectOnMap()) {
 
-                    console.log(self.scene.issetObjectOnMap());
-                    
                     self.scene.actionOnMap();
                     self.scene.render();
 
-                } else {
+                }
+                else {
 
                     self.gameOver();
 
@@ -135,13 +134,12 @@ var cowsandtigers = (function () {
 
         for (var indexObject = 0; indexObject < this.map.objectsOnMap.length; indexObject++) {
             if (
-                this.map.objectsOnMap[indexObject].className == "cows"
+                this.map.objectsOnMap[indexObject].className === "cows"
                 ||
-                this.map.objectsOnMap[indexObject].className == "tigers"
+                this.map.objectsOnMap[indexObject].className === "tigers"
             ) {
 
-                var unit = this.map.objectsOnMap[indexObject];
-                unit.action(this.map, indexObject);
+                this.map.objectsOnMap[indexObject].action(this.map, indexObject);
 
             }
         }
@@ -317,6 +315,7 @@ var cowsandtigers = (function () {
      * @param indexObject
      */
     Map.prototype.updateUnitRowColInObjectsOnMap = function (unit, indexObject) {
+        console.log(this.objectsOnMap[indexObject]);
         this.objectsOnMap[indexObject].positionRow = unit.positionRow;
         this.objectsOnMap[indexObject].positionCol = unit.positionCol;
     }
@@ -336,199 +335,12 @@ var cowsandtigers = (function () {
     }
 
     Map.prototype.issetObjectOnMap = function () {
-        return (this.objectsOnMap.length > 0);
-    }
-    // ------------------------------------------
-
-
-    /**
-     * Основной Прототип объекта на карте
-     * @param className
-     * @param id
-     * @param objPositionRow
-     * @param objPositionCol
-     * @constructor
-     */
-    function Unit(className, id, objPositionRow, objPositionCol) {
-        this.id = id;
-        this.className = className;
-        this.positionRow = objPositionRow;
-        this.positionCol = objPositionCol;
-        this.foodType = this.getFoodType();
-        this.health = 100;
-        this.enemy = (className == 'cows' ? 'tigers' : 'cows');
-
-        this.soundEat = new GameSounds("audio/eat_" + this.className + ".mp3");
-
-        // Выберим алгоритм поведения для объекта
-        this.algoritms = this.selectAlgorithm();
+        return this.objectsOnMap.length > 0 ? true : false;
     }
 
-
-    /**
-     * Вывод HTML объекта
-     * @returns {string}
-     */
-    Unit.prototype.show = function () {
-        var unitHealth = "";
-
-        if (this.className == 'cows' || this.className == 'tigers') {
-            var classHealthColor = this.getClassHealthColor(this.health);
-
-
-            unitHealth += "<div class='b-unit__health'>"
-                + "<div class='b-healt__indicator " + classHealthColor + "' style='width: "+this.health+"%;'></div>"
-                + "</div>";
-        }
-
-        return "<div class='b-unit "+this.className+"'>" + unitHealth + "</div>";
-    };
-
-
-    Unit.prototype.getClassHealthColor = function (value) {
-
-        if (parseInt(value) >= 90 && parseInt(value) <= 100) {
-            return "b-healt__indicator_life-good";
-        }
-        if (parseInt(value) >= 75 && parseInt(value) <= 90) {
-            return "b-healt__indicator_life-above-average";
-        }
-        if (parseInt(value) >= 50 && parseInt(value) <= 75) {
-            return "b-healt__indicator_life-average";
-        }
-        if (parseInt(value) >= 25 && parseInt(value) <= 50) {
-            return "b-healt__indicator_life-below-average";
-        }
-        if (parseInt(value) >= 0 && parseInt(value) <= 25) {
-            return "b-healt__indicator_life-low";
-        }
-
-    };
-
-    /**
-     * Разные действия объекта
-     */
-    Unit.prototype.action = function (map, indexObject) {
-        if (this.algoritms) {
-            this.algoritms.action(this, map, indexObject);
-        }
-    };
-
-    /**
-     * Получим цель ради которой живет Unit :)
-     * @returns {*}
-     */
-    Unit.prototype.getFoodType = function () {
-        switch(this.className) {
-            case 'cows':
-                return 'grass';
-                break;
-            case 'tigers':
-                return 'cows';
-                break;
-            default:
-                return null;
-        }
-    }
-
-
-    /**
-     * Вернет для объекта его алгоритм поведения в игре
-     * @param id
-     * @returns {*}
-     */
-    Unit.prototype.selectAlgorithm = function () {
-        /**
-         * 0 - grass
-         * 1 - cows
-         * 2 - tigers
-         * 3 - ground
-         * 4 - death
-         */
-
-        switch (parseInt(this.id)) {
-            case 0:
-                return new GrassAlgorithm();
-                break;
-            case 1:
-                return new CowsAlgorithm();
-                break;
-            case 2:
-                return new TigersAlgorithm();
-                break;
-            case 3:
-                return new GroundAlgorithm();
-                break;
-            case 4:
-                return new DeathAlgorithm();
-                break;
-        }
-    };
-
-
-    Unit.prototype.updateRowCol = function (unit) {
-        this.positionRow = unit.positionRow;
-        this.positionCol = unit.positionCol;
-    }
-
-    Unit.prototype.addHealth = function (value) {
-        this.health = this.health + parseInt(value);
-    }
-    Unit.prototype.subHealth = function (value) {
-        this.health = this.health - parseInt(value);
-    }
-    // ------------------------------------------
-
-
-    /**
-     * Агоритм повидения объектов
-     * @constructor
-     */
-    function Algorithm () {
-        this.addHealth = 10;
-        this.subHealth = 5;
-    }
-
-    // Главный мотиватор действий в игре
-    Algorithm.prototype.action = function (unit, map, indexObject) {
-
-        // Проверим соседнии клетки
-        var neighboringsCell = this.checkUnitNeighboringsCell(map, unit);
-
-
-        /**
-         * Проверим вокруг еду
-         * Если есть, вернет массив, иначе пустой массив
-         */
-        var neighboringsCellWithFood = this.filterCellByType(neighboringsCell, unit.foodType);
-
-        /**
-        * Проверим вокруг врагов(тигров)
-        * Если есть, вернет массив, иначе пустой массив
-        * */
-        var neighboringsCellWithEnemies = this.filterCellByType(neighboringsCell, unit.enemy);
-
-        /**
-         * Проверим вокруг свободные ячейки куда можно переместиться
-         * Если есть, вернет массив, иначе пустой массив
-         */
-        var neighboringsCellWithGround = this.filterCellByType(neighboringsCell, "ground");
-
-        var data = {
-            unit: unit,
-            map: map,
-            neighboringsCell: neighboringsCell,
-            neighboringsCellWithFood: neighboringsCellWithFood,
-            neighboringsCellWithEnemies: neighboringsCellWithEnemies,
-            neighboringsCellWithGround: neighboringsCellWithGround
-        }
-
-        // Все необходимые данные полученны, сделаем ход
-        this.move(data, indexObject);
-    };
 
     // Проверим соседнии клетки +
-    Algorithm.prototype.checkUnitNeighboringsCell = function (map, unit) {
+    Map.prototype.checkUnitNeighboringsCell = function (map, unit) {
         if (
             unit.className == 'tigers'
             ||
@@ -682,7 +494,7 @@ var cowsandtigers = (function () {
      * @param unitType
      * @returns {Array}
      */
-    Algorithm.prototype.filterCellByType = function (neighboringsCell, unitType) {
+    Map.prototype.filterCellByType = function (neighboringsCell, unitType) {
 
         var arr = [];
 
@@ -703,12 +515,150 @@ var cowsandtigers = (function () {
         return arr;
     };
     // ------------------------------------------
-    
-    // COWS ALGORITM
-    function CowsAlgorithm() {}
-    CowsAlgorithm.prototype = new Algorithm();
-    CowsAlgorithm.constructor = 'CowsAlgorithm';
 
+
+    /**
+     * Основной Прототип объекта на карте
+     * @param className
+     * @param id
+     * @param objPositionRow
+     * @param objPositionCol
+     * @constructor
+     */
+    function Unit(className, id, objPositionRow, objPositionCol) {
+        this.id = id;
+        this.className = className;
+        this.positionRow = objPositionRow;
+        this.positionCol = objPositionCol;
+        this.foodType = this.getFoodType();
+        this.health = 100;
+        this.enemy = (className == 'cows' ? 'tigers' : null);
+
+        this.soundEat = new GameSounds("audio/eat_" + this.className + ".mp3");
+
+        // Выберим алгоритм поведения для объекта
+        this.algoritms = this.selectAlgorithm();
+    }
+
+
+    /**
+     * Вывод HTML объекта
+     * @returns {string}
+     */
+    Unit.prototype.show = function () {
+        var unitHealth = "";
+
+        if (this.className == 'cows' || this.className == 'tigers') {
+            var classHealthColor = this.getClassHealthColor(this.health);
+
+
+            unitHealth += "<div class='b-unit__health'>"
+                + "<div class='b-healt__indicator " + classHealthColor + "' style='width: "+this.health+"%;'></div>"
+                + "</div>";
+        }
+
+        return "<div class='b-unit "+this.className+"'>" + unitHealth + "</div>";
+    };
+
+
+    Unit.prototype.getClassHealthColor = function (value) {
+
+        if (parseInt(value) >= 90 && parseInt(value) <= 100) {
+            return "b-healt__indicator_life-good";
+        }
+        if (parseInt(value) >= 75 && parseInt(value) <= 90) {
+            return "b-healt__indicator_life-above-average";
+        }
+        if (parseInt(value) >= 50 && parseInt(value) <= 75) {
+            return "b-healt__indicator_life-average";
+        }
+        if (parseInt(value) >= 25 && parseInt(value) <= 50) {
+            return "b-healt__indicator_life-below-average";
+        }
+        if (parseInt(value) >= 0 && parseInt(value) <= 25) {
+            return "b-healt__indicator_life-low";
+        }
+
+    };
+
+    /**
+     * Разные действия объекта
+     */
+    Unit.prototype.action = function (map, indexObject) {
+        this.algoritms.action(this, map, indexObject);
+    };
+
+    /**
+     * Получим цель ради которой живет Unit :)
+     * @returns {*}
+     */
+    Unit.prototype.getFoodType = function () {
+        switch(this.className) {
+            case 'cows':
+                return 'grass';
+                break;
+            case 'tigers':
+                return 'cows';
+                break;
+            default:
+                return null;
+        }
+    }
+
+
+    /**
+     * Вернет для объекта его алгоритм поведения в игре
+     * @param id
+     * @returns {*}
+     */
+    Unit.prototype.selectAlgorithm = function () {
+        /**
+         * 0 - grass
+         * 1 - cows
+         * 2 - tigers
+         * 3 - ground
+         * 4 - death
+         */
+
+        switch (parseInt(this.id)) {
+            case 0:
+                return new GrassAlgorithm();
+                break;
+            case 1:
+                return new CowsAlgorithm();
+                break;
+            case 2:
+                return new TigersAlgorithm();
+                break;
+            case 3:
+                return new GroundAlgorithm();
+                break;
+            case 4:
+                return new DeathAlgorithm();
+                break;
+        }
+    };
+
+
+    Unit.prototype.updateRowCol = function (unit) {
+        this.positionRow = unit.positionRow;
+        this.positionCol = unit.positionCol;
+    }
+
+    Unit.prototype.addHealth = function (value) {
+        this.health = this.health + parseInt(value);
+    }
+    Unit.prototype.subHealth = function (value) {
+        this.health = this.health - parseInt(value);
+    }
+    // ------------------------------------------
+
+
+    // COWS ALGORITM
+    function CowsAlgorithm() {
+        this.addHealth = 10;
+        this.subHealth = 5;
+    }
 
     CowsAlgorithm.prototype.move = function (data, indexObject) {
 
@@ -721,18 +671,21 @@ var cowsandtigers = (function () {
          * Массив с Землёй              - data.neighboringsCellWithGround
          */
 
-        if (data.unit.health > 5) {
+        if (data.unit.health > 0) {
             // Проверим есть рядом хищники
             if (data.neighboringsCellWithEnemies.length > 0) {
                 // Бежим от Тигра
                 this.moveAwayFromEnemy(data.map, data.unit, data.neighboringsCellWithGround, indexObject);
+                return false;
             }
             // Проверим есть рядом еда
             else if (data.neighboringsCellWithFood.length > 0) {
                 this.moveToFood(data.map, data.unit, data.neighboringsCellWithFood, indexObject);
+                return false;
             }
             else {
                 this.moveFree(data.map, data.unit, data.neighboringsCellWithGround, indexObject);
+                return false;
             }
         } else {
             data.map.killUnit(data.unit, indexObject);
@@ -756,13 +709,14 @@ var cowsandtigers = (function () {
 
         // На место старого Unit поставим ground
         map.setCell(unit, new Unit(
-                                    neighboringsCellWithGround[cellRandomRowCol].className,
+                                    'ground',
                                     3,
+                                    // Запишем позицию старого unit
                                     unit.positionRow,
                                     unit.positionCol)
                             );
 
-        // Для старого Unit зададим новые Row/Col
+        // Для старого Unit зададим новые Row/Col и запишим в новую ячейку корову
         map.setCell(neighboringsCellWithGround[cellRandomRowCol], oldUnit);
 
         // Обновим RC в массиве objectsOnMap
@@ -829,18 +783,15 @@ var cowsandtigers = (function () {
         // Получим произволный индекс в массиве с землей
         var cellRandomRowCol = tools.randomInteger(0, neighboringsCellWithGround.length - 1);
 
-
-        // ПОВТОРЯЮЩИЙСЯ УЖЕ ТРЕТИЙ РАЗ КОД!!! Первый в [moveAwayFromEnemy] для Cows
-        // Сохраним старый Unit и его RC (Row/Col)
         var oldUnit = unit;
 
         // На место старого Unit поставим ground
         map.setCell(unit, new Unit(
-            "ground",
-            3,
-            unit.positionRow,
-            unit.positionCol)
-        );
+                                "ground",
+                                3,
+                                unit.positionRow,
+                                unit.positionCol)
+                            );
 
         // Для старого Unit зададим новые Row/Col
         map.setCell(neighboringsCellWithGround[cellRandomRowCol], oldUnit);
@@ -852,12 +803,52 @@ var cowsandtigers = (function () {
 
         // unit.soundEat.play();
     }
+
+
+    // Главный мотиватор действий в игре
+    CowsAlgorithm.prototype.action = function (unit, map, indexObject) {
+
+        // Проверим соседнии клетки
+        var neighboringsCell = map.checkUnitNeighboringsCell(map, unit);
+
+
+        /**
+         * Проверим вокруг еду
+         * Если есть, вернет массив, иначе пустой массив
+         */
+        var neighboringsCellWithFood = map.filterCellByType(neighboringsCell, unit.foodType);
+
+        /**
+         * Проверим вокруг врагов(тигров)
+         * Если есть, вернет массив, иначе пустой массив
+         * */
+        var neighboringsCellWithEnemies = map.filterCellByType(neighboringsCell, unit.enemy);
+
+        /**
+         * Проверим вокруг свободные ячейки куда можно переместиться
+         * Если есть, вернет массив, иначе пустой массив
+         */
+        var neighboringsCellWithGround = map.filterCellByType(neighboringsCell, "ground");
+
+        var data = {
+            unit: unit,
+            map: map,
+            neighboringsCell: neighboringsCell,
+            neighboringsCellWithFood: neighboringsCellWithFood,
+            neighboringsCellWithEnemies: neighboringsCellWithEnemies,
+            neighboringsCellWithGround: neighboringsCellWithGround
+        }
+
+        // Все необходимые данные полученны, сделаем ход
+        this.move(data, indexObject);
+    };
     // ------------------------------------------
 
     // TIGERS ALGORITM
-    function TigersAlgorithm() {}
-    TigersAlgorithm.prototype = new Algorithm();
-    TigersAlgorithm.constructor = 'TigersAlgorithm';
+    function TigersAlgorithm() {
+        this.addHealth = 10;
+        this.subHealth = 5;
+    }
 
     TigersAlgorithm.prototype.move = function (data, indexObject) {
         /**
@@ -868,23 +859,23 @@ var cowsandtigers = (function () {
          * Массив с Тиграми             - data.neighboringsCellWithEnemies
          * Массив с Землёй              - data.neighboringsCellWithGround
          */
-        console.log(data);
+        // console.log(data);
 
-        // if (data.unit.health > 5) {
+        if (data.unit.health > 0) {
         // //
         // //     // Проверим есть рядом еда
-        // //     if (data.neighboringsCellWithFood.length > 0) {
-        // //         this.moveToFood(data.map, data.unit, data.neighboringsCellWithFood, indexObject);
-        // //     }
-        // //     // else {
-        //         if (data.neighboringsCellWithGround.length > 0) {
-        //             this.moveFree(data.map, data.unit, data.neighboringsCellWithGround, indexObject);
+            if (data.neighboringsCellWithFood.length > 0) {
+                this.moveToFood(data.map, data.unit, data.neighboringsCellWithFood, indexObject);
+            }
+            // else {
+                if (data.neighboringsCellWithGround.length > 0) {
+                    this.moveFree(data.map, data.unit, data.neighboringsCellWithGround, indexObject);
+
+            }
+        } else {
         //
-        //     }
-        // } else {
-        //
-        //     data.map.killUnit(data.unit, indexObject);
-        // }
+            data.map.killUnit(data.unit, indexObject);
+        }
     };
 
     /**
@@ -901,7 +892,7 @@ var cowsandtigers = (function () {
         // Получим произволный индекс в массиве еды
         var cellRandomRowCol = tools.randomInteger(0, neighboringsCellWithFood.length - 1);
 
-        console.log(neighboringsCellWithFood[cellRandomRowCol]);
+        // console.log(neighboringsCellWithFood[cellRandomRowCol]);
 
         // ПОВТОРЯЮЩИЙСЯ УЖЕ ВТОРОЙ РАЗ КОД!!! Первый в [moveAwayFromEnemy] для Cows
         // Сохраним старый Unit и его RC (Row/Col)
@@ -948,11 +939,6 @@ var cowsandtigers = (function () {
         // Получим произволный индекс в массиве с землей
         var cellRandomRowCol = tools.randomInteger(0, neighboringsCellWithGround.length - 1);
 
-
-        console.log(neighboringsCellWithGround[cellRandomRowCol]);
-
-        // ПОВТОРЯЮЩИЙСЯ УЖЕ ТРЕТИЙ РАЗ КОД!!! Первый в [moveAwayFromEnemy] для Cows
-        // Сохраним старый Unit и его RC (Row/Col)
         var oldUnit = unit;
 
         // На место старого Unit поставим ground
@@ -973,24 +959,50 @@ var cowsandtigers = (function () {
 
         // unit.soundEat.play();
     }
+
+
+    // Главный мотиватор действий в игре
+    TigersAlgorithm.prototype.action = function (unit, map, indexObject) {
+
+        // Проверим соседнии клетки
+        var neighboringsCell = map.checkUnitNeighboringsCell(map, unit);
+
+
+        /**
+         * Проверим вокруг еду
+         * Если есть, вернет массив, иначе пустой массив
+         */
+        var neighboringsCellWithFood = map.filterCellByType(neighboringsCell, unit.foodType);
+
+        /**
+         * Проверим вокруг свободные ячейки куда можно переместиться
+         * Если есть, вернет массив, иначе пустой массив
+         */
+        var neighboringsCellWithGround = map.filterCellByType(neighboringsCell, "ground");
+
+        var data = {
+            unit: unit,
+            map: map,
+            neighboringsCell: neighboringsCell,
+            neighboringsCellWithFood: neighboringsCellWithFood,
+            neighboringsCellWithGround: neighboringsCellWithGround
+        }
+
+        // Все необходимые данные полученны, сделаем ход
+        this.move(data, indexObject);
+    };
     // ------------------------------------------
 
     // GRASS ALGORITM
     function GrassAlgorithm() {}
-    GrassAlgorithm.prototype = new Algorithm();
-    GrassAlgorithm.constructor = 'GrassAlgorithm';
     // ------------------------------------------
 
     // GROUND ALGORITM
     function GroundAlgorithm() {}
-    GroundAlgorithm.prototype = new Algorithm();
-    GroundAlgorithm.constructor = 'GroundAlgorithm';
     // ------------------------------------------
 
     // DEATH ALGORITM
     function DeathAlgorithm() {}
-    DeathAlgorithm.prototype = new Algorithm();
-    DeathAlgorithm.constructor = 'DeathAlgorithm';
     // ------------------------------------------
 
     // AUDIO IN GAME
