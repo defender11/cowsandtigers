@@ -14,24 +14,26 @@
 
     <script src="js/cowsandtigers.js"></script>
     <script>
+
+        // PROD
         var setting = {
             gameContainerID: 'b-game',
             mapSize: {
-                row: 5,
-                col: 5
+                row: 9,
+                col: 23
             },
             mapObjects: {
                 grass: {
-                    min: 4,
-                    max: 7
+                    min: 90,
+                    max: 175
                 },
                 cows: {
-                    min: 3,
-                    max: 5
+                    min: 15,
+                    max: 20
                 },
                 tigers: {
-                    min: 2,
-                    max: 3
+                    min: 4,
+                    max: 7
                 },
                 ground: {
                     min: null,
@@ -39,8 +41,37 @@
                 }
             },
             devMode: false,
-            timeRender: 500
+            timeRender: 530
         };
+
+        // DEV
+        /*var setting = {
+            gameContainerID: 'b-game',
+            mapSize: {
+                row: 5,
+                col: 5
+            },
+            mapObjects: {
+                grass: {
+                    min: 7,
+                    max: 13
+                },
+                cows: {
+                    min: 2,
+                    max: 5
+                },
+                tigers: {
+                    min: 2,
+                    max: 4
+                },
+                ground: {
+                    min: null,
+                    max: null
+                }
+            },
+            devMode: false,
+            timeRender: 530
+        };*/
 
         // После загрузки документа запустим игру
         window.onload = (function () {
