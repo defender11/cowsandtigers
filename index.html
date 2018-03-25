@@ -12,19 +12,18 @@
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/style.css">
 
-    <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/cowsandtigers.js"></script>
     <script>
         var setting = {
             gameContainerID: 'b-game',
             mapSize: {
-                row: 8,
-                col: 8
+                row: 5,
+                col: 5
             },
             mapObjects: {
                 grass: {
-                    min: 10,
-                    max: 30
+                    min: 4,
+                    max: 7
                 },
                 cows: {
                     min: 3,
@@ -43,9 +42,8 @@
             timeRender: 500
         };
 
-
         // После загрузки документа запустим игру
-        $(function () {
+        window.onload = (function () {
             cowsandtigers.init(setting);
         });
     </script>

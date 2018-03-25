@@ -152,8 +152,8 @@ html {
 }
 
 #b-game #b-game__plain .b-unit .b-unit__health .b-healt__indicator.b-healt__indicator_life-good { background: #84c700; }
-#b-game #b-game__plain .b-unit .b-unit__health .b-healt__indicator.b-healt__indicator_life-above-average { background: #ce7900; }
-#b-game #b-game__plain .b-unit .b-unit__health .b-healt__indicator.b-healt__indicator_life-average { background: #c6cd2e; }
+#b-game #b-game__plain .b-unit .b-unit__health .b-healt__indicator.b-healt__indicator_life-above-average { background: #c7ce00; }
+#b-game #b-game__plain .b-unit .b-unit__health .b-healt__indicator.b-healt__indicator_life-average { background: #cdb45c; }
 #b-game #b-game__plain .b-unit .b-unit__health .b-healt__indicator.b-healt__indicator_life-below-average { background: #ce4c2e; }
 #b-game #b-game__plain .b-unit .b-unit__health .b-healt__indicator.b-healt__indicator_life-low { background: #f00; }
 
