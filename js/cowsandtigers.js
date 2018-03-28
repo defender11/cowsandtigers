@@ -43,13 +43,14 @@ var cowsandtigers = (function () {
         if (!devMode) {
             // Главный Loop
             setInterval(function () {
-                if (scene.issetObjectOnMap()) {
+                // if (scene.issetObjectOnMap()) {
+                    scene.dieManager();
                     scene.actionOnMap();
                     scene.render();
-                }
-                else {
-                    self.gameOver();
-                }
+                // }
+                // else {
+                //     self.gameOver();
+                // }
             }, self.timeRender);
         } else {
             if (scene.issetObjectOnMap()) {
@@ -84,6 +85,8 @@ var cowsandtigers = (function () {
     Scene.prototype.build = function () {
         this.map.init();
         this.map.generate();
+
+        console.log(this.map);
     };
 
 
@@ -92,6 +95,7 @@ var cowsandtigers = (function () {
      */
     Scene.prototype.render = function () {
         var mapHTML = '';
+
 
         // Построим игровое поле
         for (var positionRow = 0; positionRow < this.map.row; positionRow++) {
@@ -111,20 +115,20 @@ var cowsandtigers = (function () {
      * Действия всех объектов на карте
      */
     Scene.prototype.actionOnMap = function () {
-        //TODO:  Задваиваеться массив иногда - ???
         // console.log(this.map.objectsOnMap);
 
         for (var indexObject = 0; indexObject < this.map.objectsOnMap.length; indexObject++) {
-            // if (
-            //     this.map.objectsOnMap[indexObject].className === "cows"
-            //     ||
-            //     this.map.objectsOnMap[indexObject].className === "tigers"
-            // ) {
-                this.map.objectsOnMap[indexObject].action(this.map, indexObject);
-            // }
+            this.map.objectsOnMap[indexObject].action(this.map, indexObject);
         }
     };
 
+    Scene.prototype.dieManager = function () {
+        if (this.map.dieObjectsOnMap.length > 0) {
+            for (var indexObject = 0; indexObject < this.map.dieObjectsOnMap.length; indexObject++) {
+                this.map.dieObjectsOnMap[indexObject].resurection(this.map, indexObject);
+            }
+        }
+    }
 
     /**
      * Проверим есть ли еще объекты в массиве для сущевствования игры
@@ -148,7 +152,9 @@ var cowsandtigers = (function () {
         this.mapObjects = setting.mapObjects;
 
         // Список объектов, которые задействованны на карте
-        this.objectsOnMap = [];
+        this.objectsOnMap = new Array();
+
+        this.dieObjectsOnMap = new Array();
 
         this.row = setting.mapSize.row || 0;
         this.col = setting.mapSize.col || 0;
@@ -198,7 +204,14 @@ var cowsandtigers = (function () {
 
                 if (!this.mapData[mapRowCol.row][mapRowCol.col]) {
 
-                    var unit = new Unit(objID, objectName, mapRowCol.row, mapRowCol.col);
+                    var unitParam = {
+                        id: objID,
+                        className: objectName,
+                        objPositionRow: mapRowCol.row,
+                        objPositionCol: mapRowCol.col
+                    };
+
+                    var unit = new Unit(unitParam);
 
                     this.mapData[mapRowCol.row][mapRowCol.col] = unit;
 
@@ -238,7 +251,14 @@ var cowsandtigers = (function () {
             // console.log('mapRowColRecursive: ', mapRowCol);
 
             if (this.mapData[mapRowCol.row][mapRowCol.col] === undefined) {
-                var unit = new Unit(objectSetting.objID, objectSetting.objectName, mapRowCol.row, mapRowCol.col);
+                var unitParam = {
+                    id: objectSetting.objID,
+                    className: objectSetting.objectName,
+                    objPositionRow: mapRowCol.row,
+                    objPositionCol: mapRowCol.col
+                };
+
+                var unit = new Unit(unitParam);
 
                 this.mapData[mapRowCol.row][mapRowCol.col] = unit;
 
@@ -538,6 +558,10 @@ var cowsandtigers = (function () {
             }
         }
     }
+
+    Map.prototype.addDieUnitToDieArray = function (unit) {
+        this.dieObjectsOnMap.push(unit);
+    }
     // ------------------------------------------
 
 
@@ -549,14 +573,14 @@ var cowsandtigers = (function () {
      * @param objPositionCol
      * @constructor
      */
-    function Unit(id, className, objPositionRow, objPositionCol) {
-        this.id = id;
-        this.className = className;
-        this.positionRow = objPositionRow;
-        this.positionCol = objPositionCol;
+    function Unit(param) {
+        this.id = param.id;
+        this.className = param.className;
+        this.positionRow = param.objPositionRow;
+        this.positionCol = param.objPositionCol;
         this.foodType = this.getFoodType();
         this.health = 100;
-        this.enemy = (className == 'cows' ? 'tigers' : null);
+        this.enemy = (param.className == 'cows' ? 'tigers' : null);
 
         this.foodInformation = {
             isEat: false,
@@ -564,13 +588,25 @@ var cowsandtigers = (function () {
             positionCol: null
         }
 
+        this.dieInformation = {
+            isDie: param.className == 'death' ? true : false,
+            dieUnitName: className,
+            unitResurectionInterval: 3,
+            unitResurectionIntervalLeft: 3
+        }
+
         this.soundEat = new GameSounds("audio/eat_" + this.className + ".mp3");
 
         // Выберим алгоритм поведения для объекта
-        this.algoritms = this.selectAlgorithm(id);
+        this.algoritms = this.selectAlgorithm(param.id);
 
     }
 
+    Unit.prototype.resurection = function () {
+        if (this.dieInformation.isDie) {
+
+        }
+    }
 
     /**
      * Вывод HTML объекта
@@ -992,17 +1028,22 @@ var cowsandtigers = (function () {
         // Проверим убил ли данный тигр только что корову,
         // если да, то на след. шаге поставим на его место табличку
         if (unit.foodInformation.isEat) {
-            map.setCell(unit, new Unit(
-                                        4,
-                                        "death",
-                                        unit.foodInformation.positionRow,
-                                        unit.foodInformation.positionCol
-                                )
-            );
+            var unitParam = {
+                id: 4,
+                className: "death",
+                objPositionRow: unit.foodInformation.positionRow,
+                objPositionCol: unit.foodInformation.positionCol
+            };
+
+            map.setCell(unit, new Unit(unitParam));
 
             unit.foodInformation.isEat = false;
             unit.foodInformation.positionRow = null;
             unit.foodInformation.positionCol = null;
+
+           //  !!!!!!!!!!!!!!!
+           // TODO: ДОДЕЛАТЬ
+           unit.dieInformation.isDie = true
 
         } else {
             // На место старого Unit поставим ground
