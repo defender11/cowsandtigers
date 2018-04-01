@@ -63,6 +63,7 @@ html {
 #b-game  #b-game__plain {
     display: flex;
     flex-flow: column nowrap;
+    overflow: hidden;
 }
 #b-game #b-game__plain .row {
     display: flex;
@@ -129,6 +130,26 @@ html {
 #b-game #b-game__plain .cell .death {
     background: url('../img/rip.png')center;
     background-size: cover;
+}
+
+#b-game #b-game__plain .cell::before {
+    content: ' ';
+    position: absolute;
+    display: block;
+    box-sizing: border-box;
+    -webkit-box-shadow: inset 0px 0px 20px 1px rgba(0, 0, 0, 0.78), 0px 0px 8px 11px rgba(0, 0, 0, 0.53);
+    -moz-box-shadow: inset 0px 0px 20px 1px rgba(0, 0, 0, 0.78), 0px 0px 8px 11px rgba(0, 0, 0, 0.53);
+    box-shadow: inset 0px 0px 20px 1px rgba(0, 0, 0, 0.78), 0px 0px 8px 11px rgba(0, 0, 0, 0.53);
+    top: 87%;
+    left: 25%;
+    right: 25%;
+    bottom: 0;
+    width: 70%;
+    height: 1vh;
+    border-radius: 50%;
+    -webkit-transform: scale(1) rotate(0deg) translate(-7px, 0px) skew(0deg, 0deg);
+    -moz-transform: scale(1) rotate(0deg) translate(-7px, 0px) skew(0deg, 0deg);
+    transform: scale(1) rotate(0deg) translate(-7px, 0px) skew(0deg, 0deg);
 }
 
 #b-game #b-game__plain .b-unit .b-unit__health {
