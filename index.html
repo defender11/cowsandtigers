@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
 
     <script src="js/cowsandtigers.js"></script>
     <script>
@@ -44,34 +45,34 @@
             timeRender: 500
         };
 
-        // // DEV
-        // var setting = {
-        //     gameContainerID: 'b-game',
-        //     mapSize: {
-        //         row: 6,
-        //         col: 6
-        //     },
-        //     mapObjects: {
-        //         grass: {
-        //             min: 7,
-        //             max: 13
-        //         },
-        //         cows: {
-        //             min: 2,
-        //             max: 5
-        //         },
-        //         tigers: {
-        //             min: 2,
-        //             max: 4
-        //         },
-        //         ground: {
-        //             min: null,
-        //             max: null
-        //         }
-        //     },
-        //     devMode: false,
-        //     timeRender: 530
-        // };
+        // DEV
+        /*var setting = {
+            gameContainerID: 'b-game',
+            mapSize: {
+                row: 6,
+                col: 6
+            },
+            mapObjects: {
+                grass: {
+                    min: 7,
+                    max: 13
+                },
+                cows: {
+                    min: 2,
+                    max: 5
+                },
+                tigers: {
+                    min: 2,
+                    max: 4
+                },
+                ground: {
+                    min: null,
+                    max: null
+                }
+            },
+            devMode: false,
+            timeRender: 530
+        };*/
 
         // После загрузки документа запустим игру
         window.onload = (function () {
@@ -95,12 +96,16 @@
     </section>
 
     <div class="b-buttons">
-        <a href="/" class="b-buttons__btn-restart">RESTART</a>
+        <a href="/" class="b-buttons__btn b-buttons__btn-restart"><i class="fa fa-gamepad" aria-hidden="true"></i> Новая игра</a>
+        <a href="javascript:void(0);" id="b-buttons__btn-start" class="b-buttons__btn"><i class="fa fa-play" aria-hidden="true"></i> Начать игру</a>
+        <a href="javascript:void(0);" id="b-buttons__btn-pause" class="b-buttons__btn"><i class="fa fa-pause" aria-hidden="true"></i> Остановить игру</a>
     </div>
 
     <!--GAME BLOCK-->
     <section id="b-game">
-        <div id="b-game__plain"></div>
+        <div id="b-game__plain">
+
+        </div>
     </section>
 
     <!--FOOTER BLOCK-->

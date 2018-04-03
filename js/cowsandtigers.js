@@ -23,6 +23,9 @@ var cowsandtigers = (function () {
 
         // Установим скорость игрового цикла
         this.timeRender = setting.timeRender || 500;
+
+        this.btnStart = document.getElementById('b-buttons__btn-start');
+        this.btnPause = document.getElementById('b-buttons__btn-pause');
     }
 
 
@@ -35,31 +38,46 @@ var cowsandtigers = (function () {
         var scene = new Scene(this.setting);
 
         // Создадим игровое поле на сцене
-        scene.build();
+        if (scene.build()) {
 
-        // return false;
-        var self = this;
+            scene.plain.innerHTML = "<p class='b-title__text'>Игра загружена.</p> " +
+                "<br />" +
+                "<p class='b-title__text'>Нажмите 'Начать игру'.</p>";
 
-        if (!devMode) {
-            // Главный Loop
-            setInterval(function () {
-                // if (scene.issetObjectOnMap()) {
+            // return false;
+            var self = this;
+            var loop;
+
+            if (!devMode) {
+                this.btnStart.addEventListener('click', function () {
+                    // Главный Loop
+                    loop = setInterval(function (callback) {
+                        if (scene.issetObjectOnMap()) {
+                            scene.dieManager();
+                            scene.actionOnMap();
+                            scene.render();
+                        } else {
+                            self.gameOver();
+                        }
+
+                    }, self.timeRender);
+                })
+
+                this.btnPause.addEventListener('click', function () {
+                    clearInterval(loop);
+                });
+            } else {
+                if (scene.issetObjectOnMap()) {
                     scene.dieManager();
                     scene.actionOnMap();
                     scene.render();
-                // }
-                // else {
-                //     self.gameOver();
-                // }
-            }, self.timeRender);
-        } else {
-            if (scene.issetObjectOnMap()) {
-                scene.actionOnMap();
-                scene.render();
-            } else {
-                self.gameOver();
+                } else {
+                    self.gameOver();
+                }
             }
         }
+
+
     };
 
     Game.prototype.gameOver = function () {
@@ -83,10 +101,10 @@ var cowsandtigers = (function () {
      * Проинициализируем карту и заполним ее объектами
      */
     Scene.prototype.build = function () {
-        this.map.init();
-        this.map.generate();
 
-        // console.log(this.map);
+        if (this.map.init()) {
+            return this.map.generate();
+        }
     };
 
 
@@ -166,6 +184,10 @@ var cowsandtigers = (function () {
      */
     Map.prototype.init = function () {
         while(this.mapData.push([]) < this.row);
+
+        if (this.mapData.length == this.row) {
+            return true;
+        }
     };
 
 
@@ -234,6 +256,8 @@ var cowsandtigers = (function () {
 
             objID++;
         }
+
+        return true;
     };
 
 
@@ -286,6 +310,7 @@ var cowsandtigers = (function () {
             }
         }
     };
+
 
     /**
      * Получим произвольные координаты на основе кол-во строк и колонок
