@@ -1,5 +1,7 @@
+import Algorithm from './algorithm';
+
 // GROUND ALGORITM
-function GroundAlgorithm() {}
-GroundAlgorithm.prototype = new Algorithm();
-GroundAlgorithm.constructor = GroundAlgorithm;
+export default class GroundAlgorithm extends Algorithm {
+    act () {};
+}
 // ------------------------------------------

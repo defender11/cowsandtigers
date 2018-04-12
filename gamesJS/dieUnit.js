@@ -1,22 +1,23 @@
-function DieUnit(param) {
-    Entity.call(this, param);
+import Entity from './entity';
+import DeathAlgorithm from './algorithm/deathAlgorithm';
 
-    this.indexObject = param.indexObject;
+export default class DieUnit extends Entity {
+    constructor(param) {
+        super(param);
 
-    this.algoritms = new DeathAlgorithm();
+        this.indexObject = param.indexObject;
 
-    this.dieUnitType = param.dieUnitType;
-    this.dieUnitId = param.dieUnitId;
+        this.algoritms = new DeathAlgorithm();
 
-    this.unitResurectionInterval = 3;
-    this.unitResurectionIntervalLeft = 0;
+        this.dieUnitType = param.dieUnitType;
+        this.dieUnitId = param.dieUnitId;
 
-    // this.soundDie = new GameSounds("audio/die_" + this.className + ".mp3");
+        this.unitResurectionInterval = 3;
+        this.unitResurectionIntervalLeft = 0;
+
+        // this.soundDie = new GameSounds("audio/die_" + this.className + ".mp3");
+    }
 }
-
-DieUnit.prototype = Entity;
-DieUnit.constructor = DieUnit;
-
 
 DieUnit.prototype.setIndexObject = function (indexObject) {
     this.indexObject = indexObject;

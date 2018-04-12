@@ -1,85 +1,80 @@
 'use strict';
 
-module.exports.init = function (setting) {
-    let game = new Game(setting);
-    game.run();
-};
+import Scene from './scene';
+import setting from './setting';
 
-var devMode = false;
+export default class Game {
+    /**
+     * OBJ GAME
+     * @param setting
+     * @constructor
+     */
+    constructor () {
+        this.setting = setting;
 
-/**
- * OBJ GAME
- * @param setting
- * @constructor
- */
-function Game(setting) {
-    this.setting = setting;
+        // --------------
+        // Установим режим игры
+        this.devMode = setting.devMode || false;
 
-    // --------------
-    // Установим режим игры
-    devMode = setting.devMode || devMode;
+        // Установим скорость игрового цикла
+        this.timeRender = setting.timeRender || 500;
 
-    // Установим скорость игрового цикла
-    this.timeRender = setting.timeRender || 500;
+        this.btnStart = document.getElementById('b-buttons__btn-start');
+        this.btnPause = document.getElementById('b-buttons__btn-pause');
+    }
 
-    this.btnStart = document.getElementById('b-buttons__btn-start');
-    this.btnPause = document.getElementById('b-buttons__btn-pause');
-}
+    /**
+     * GAME LOOP
+     */
+    run () {
+        // Создадим новую сцену
+        let scene = new Scene(this.setting);
 
+        // Создадим игровое поле на сцене
+        if (scene.build()) {
 
-/**
- * GAME LOOP
- */
-Game.prototype.run = function () {
+            scene.plain.innerHTML = "<p class='b-title__text'>Игра загружена.</p> " +
+                "<br />" +
+                "<p class='b-title__text'>Нажмите 'Начать игру'.</p>";
 
-    // Создадим новую сцену
-    var scene = new Scene(this.setting);
+            // return false;
+            let self = this;
+            let loop;
 
-    // Создадим игровое поле на сцене
-    if (scene.build()) {
+            if (!this.devMode) {
+                this.btnStart.addEventListener('click', function () {
+                    // Главный Loop
+                    loop = setInterval(function (callback) {
+                        if (scene.issetObjectOnMap()) {
+                            scene.dieManager();
+                            scene.actionOnMap();
+                            scene.render();
+                        } else {
+                            self.gameOver();
+                        }
 
-        scene.plain.innerHTML = "<p class='b-title__text'>Игра загружена.</p> " +
-            "<br />" +
-            "<p class='b-title__text'>Нажмите 'Начать игру'.</p>";
+                    }, self.timeRender);
+                });
 
-        // return false;
-        var self = this;
-        var loop;
-
-        if (!devMode) {
-            this.btnStart.addEventListener('click', function () {
-                // Главный Loop
-                loop = setInterval(function (callback) {
-                    if (scene.issetObjectOnMap()) {
-                        scene.dieManager();
-                        scene.actionOnMap();
-                        scene.render();
-                    } else {
-                        self.gameOver();
-                    }
-
-                }, self.timeRender);
-            })
-
-            this.btnPause.addEventListener('click', function () {
-                clearInterval(loop);
-            });
-        } else {
-            if (scene.issetObjectOnMap()) {
-                scene.dieManager();
-                scene.actionOnMap();
-                scene.render();
+                this.btnPause.addEventListener('click', function () {
+                    clearInterval(loop);
+                });
             } else {
-                self.gameOver();
+                if (scene.issetObjectOnMap()) {
+                    scene.dieManager();
+                    scene.actionOnMap();
+                    scene.render();
+                } else {
+                    self.gameOver();
+                }
             }
         }
     }
 
+    gameOver () {
+        alert('Game Over');
+        window.location.replace("/");
+    }
+}
 
-};
-
-Game.prototype.gameOver = function () {
-    alert('Game Over');
-    window.location.replace("/");
-};
 // ------------------------------------------

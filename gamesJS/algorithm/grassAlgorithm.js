@@ -1,9 +1,7 @@
+import Algorithm from './algorithm';
+
 // GRASS ALGORITM
-function GrassAlgorithm() {}
-GrassAlgorithm.prototype = Algorithm;
-GrassAlgorithm.constructor = GrassAlgorithm;
-
-GrassAlgorithm.prototype.act = function () {
-
-};
+export default class GrassAlgorithm extends Algorithm {
+    act () {};
+}
 // ------------------------------------------

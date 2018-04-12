@@ -15,7 +15,7 @@
     "webpack-cli": "^2.0.14"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "webpack": "webpack -w"
   },
   "repository": {
     "type": "git",

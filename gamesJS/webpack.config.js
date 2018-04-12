@@ -5,7 +5,7 @@ module.exports = {
     entry: './index.js',
     output: {
         path: path.resolve(__dirname, '../js/'),
-        filename: 'cowsandtigers_test.js'
+        filename: 'cowsandtigers.js'
     },
     module: {
         rules: [
@@ -20,7 +20,7 @@ module.exports = {
         ],
     },
     devtool: "#inline-sourcemap",
-    // watch: true,
+    watch: true,
     mode: "development",
     // mode: "production"
 };
