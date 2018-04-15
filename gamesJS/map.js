@@ -173,6 +173,37 @@ export default class Map {
         }
     };
 
+    getRandomRowColBasedOnUnit(cell) {
+        let rowMin = ((cell.positionRow - 1) >= 0) ? (cell.positionRow - 1) : 0;
+        let rowMax = ((cell.positionRow + 1) <= this.row) ? (cell.positionRow + 1) : this.row;
+
+        let colMin = ((cell.positionCol - 1) >= 0) ? (cell.positionRow - 1) : 0;
+        let colMax = ((cell.positionCol + 1) <= this.col) ? (cell.positionCol + 1) : this.col;
+
+        let newPositionRow,
+            newPositionCol;
+
+        newPositionRow = this.getRandomRowColWithExclude(rowMin, rowMax, cell.positionRow);
+        newPositionCol = this.getRandomRowColWithExclude(colMin, colMax, cell.positionRow);
+
+        return {
+            positionRow: newPositionRow,
+            positionCol: newPositionCol
+        }
+    };
+
+    getRandomRowColWithExclude(minCell, maxCell, excludeValue) {
+        let value;
+
+        value = tools.randomInteger(minCell, maxCell);
+
+        while (value == excludeValue) {
+            value = tools.randomInteger(minCell, maxCell);
+        }
+
+        return value;
+    };
+
 
     getNewRowColPosition() {
         console.log("------------------");

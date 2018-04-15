@@ -18,7 +18,7 @@ export default class CowsAlgorithm  extends Algorithm {
          * Массив с Землёй              - data.neighboringsCellWithGround
          */
 
-        if (unit.health > 0) {
+        /*if (unit.health > 0) {
             // Проверим есть рядом Тигры
             if (data.neighboringsCellWithEnemies.length > 0) {
                 //Если есть свободные клетки
@@ -40,7 +40,7 @@ export default class CowsAlgorithm  extends Algorithm {
             }
         } else {
             map.killUnit(unit, indexObject);
-        }
+        }*/
     };
 
     /**

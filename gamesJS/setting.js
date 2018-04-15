@@ -54,6 +54,6 @@ export default {
         }
     },
     devMode: false,
-    timeRender: 530
+    timeRender: 1530
 };
 

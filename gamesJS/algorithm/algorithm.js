@@ -7,13 +7,13 @@ export default class Algorithm {
     getAllNeighboringsCellInformation (unit, map, indexObject) {
 
         // Проверим соседнии клетки
-        var neighboringsCell = map.checkUnitNeighboringsCell(unit);
+        let neighboringsCell = map.checkUnitNeighboringsCell(unit);
 
         /**
          * Проверим вокруг еду
          * Если есть, вернет массив, иначе пустой массив
          */
-        var neighboringsCellWithFood = map.filterCellByType(neighboringsCell, unit.foodType);
+        let neighboringsCellWithFood = map.filterCellByType(neighboringsCell, unit.foodType);
 
         if (unit.enemy !== null) {
             // TODO у тигра нет врагов
@@ -28,7 +28,7 @@ export default class Algorithm {
          * Проверим вокруг свободные ячейки куда можно переместиться
          * Если есть, вернет массив, иначе пустой массив
          */
-        var neighboringsCellWithGround = map.filterCellByType(neighboringsCell, "ground");
+        let neighboringsCellWithGround = map.filterCellByType(neighboringsCell, "ground");
 
         return {
             neighboringsCell: neighboringsCell,
@@ -36,6 +36,36 @@ export default class Algorithm {
             neighboringsCellWithEnemies: neighboringsCellWithEnemies,
             neighboringsCellWithGround: neighboringsCellWithGround
         };
-    };
+    }
+
+
+    way (map, unit, indexObject, callBackUnitAction) {
+
+        let data;
+
+        // Получим координаты unit и сохраним их
+        let unitCellSource = {
+            positionRow: unit.positionRow,
+            positionCol: unit.positionCol,
+        };
+        
+        let unitCellNew = map.getRandomRowColBasedOnUnit(unitCellSource);
+
+
+        console.log(unit);
+        console.log(unitCellNew);
+        // Необходимо сохранить координаты новой ячейки
+        // let newUnitCell = {
+        //     positionRow: 0,
+        //     positionCol: 0
+        // };
+
+
+
+        callBackUnitAction(data);
+
+    }
+
+
 }
 // ------------------------------------------

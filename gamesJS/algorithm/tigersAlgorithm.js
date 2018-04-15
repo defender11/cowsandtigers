@@ -7,7 +7,13 @@ import tools from './../tools';
 export default class TigersAlgorithm extends Algorithm {
     act (unit, map, indexObject) {
 
-        let data = this.getAllNeighboringsCellInformation(unit, map, indexObject);
+        console.log(
+            this.way(map, unit, indexObject, function (data) {
+
+            })
+        );
+
+        // let data = this.getAllNeighboringsCellInformation(unit, map, indexObject);
 
         /**
          * data:
@@ -18,7 +24,7 @@ export default class TigersAlgorithm extends Algorithm {
          * Массив с Землёй              - data.neighboringsCellWithGround
          */
 
-        if (unit.health > 0) {
+       /* if (unit.health > 0) {
             //     // Проверим есть рядом еда
             if (data.neighboringsCellWithFood.length > 0) {
                 this.moveToFood(map, unit, data.neighboringsCellWithFood, indexObject);
@@ -29,7 +35,7 @@ export default class TigersAlgorithm extends Algorithm {
         }
         else {
             map.killUnit(unit, indexObject);
-        }
+        }*/
     };
 
     /**
