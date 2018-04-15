@@ -1,10 +1,13 @@
+import tools from "../tools";
+import route from "./route";
+
 export default class Algorithm {
     constructor() {
         this.addHealthValue = 5;
         this.subHealthValue = 3;
     }
 
-    getAllNeighboringsCellInformation (unit, map, indexObject) {
+    getAllNeighboringsCellInformation(unit, map, indexObject) {
 
         // Проверим соседнии клетки
         let neighboringsCell = map.checkUnitNeighboringsCell(unit);
@@ -21,7 +24,7 @@ export default class Algorithm {
              * Проверим вокруг врагов(тигров)
              * Если есть, вернет массив, иначе пустой массив
              * */
-            var neighboringsCellWithEnemies = map.filterCellByType(neighboringsCell, unit.enemy);
+            let neighboringsCellWithEnemies = map.filterCellByType(neighboringsCell, unit.enemy);
         }
 
         /**
@@ -37,35 +40,5 @@ export default class Algorithm {
             neighboringsCellWithGround: neighboringsCellWithGround
         };
     }
-
-
-    way (map, unit, indexObject, callBackUnitAction) {
-
-        let data;
-
-        // Получим координаты unit и сохраним их
-        let unitCellSource = {
-            positionRow: unit.positionRow,
-            positionCol: unit.positionCol,
-        };
-        
-        let unitCellNew = map.getRandomRowColBasedOnUnit(unitCellSource);
-
-
-        console.log(unit);
-        console.log(unitCellNew);
-        // Необходимо сохранить координаты новой ячейки
-        // let newUnitCell = {
-        //     positionRow: 0,
-        //     positionCol: 0
-        // };
-
-
-
-        callBackUnitAction(data);
-
-    }
-
-
 }
 // ------------------------------------------
