@@ -13,7 +13,10 @@ export default class Route {
                     positionCol: unit.positionCol,
                 }
             ],
-            direction = [
+            routes = new Array(steps);
+
+        for (let i = 0; i < steps; i++) {
+            let direction = [
                 'top',
                 'topRight',
                 'right',
@@ -22,10 +25,7 @@ export default class Route {
                 'leftBottom',
                 'left',
                 'leftTop'
-            ],
-            routes = new Array(steps);
-
-        for (let i = 0; i < steps; i++) {
+            ];
             let way;
 
             // выберим направление
@@ -36,7 +36,11 @@ export default class Route {
 
             this.calculateRoute(routeCellSteps[i], function (route) {
 
-                routes.push();
+
+
+                routes.push(route);
+
+                routeData.push(route);
             });
         }
 
