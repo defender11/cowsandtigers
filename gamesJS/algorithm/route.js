@@ -1,11 +1,10 @@
 import tools from "../tools";
 
-export default class Route {
-    constructor() {}
+export default {
 
-    route(map, unit, indexObject, steps, callBackUnitRoute) {
+    calculate : function (map, unit, indexObject, steps, callBackUnitRoute) {
 
-        let routeData,
+        let routeData = [],
             unitRowColSource,
             routeCellSteps = [
                 {
@@ -26,17 +25,21 @@ export default class Route {
                 'left',
                 'leftTop'
             ];
-            let way;
+            let directionWay;
+            let newDirectionWay;
 
             // выберим направление
-            way = tools.randomInteger(0, direction.length);
+            directionWay = tools.randomInteger(0, direction.length);
 
-            // Получить новые координаты ячейки
-            routeCellSteps.push(this.getNewRowColCell(routeCellSteps[i], way, i));
+            do {
+                newDirectionWay = this.getNewRowColCell(routeCellSteps[i], directionWay, i);
+            } while (!newDirectionWay);
+
+            console.log(newDirectionWay);
+            // Получим новые координаты ячейки
+            routeCellSteps.push(newDirectionWay);
 
             this.calculateRoute(routeCellSteps[i], function (route) {
-
-
 
                 routes.push(route);
 
@@ -45,21 +48,24 @@ export default class Route {
         }
 
         callBackUnitRoute(routeData);
-    }
+    },
 
     // Получим новые координаты на основе выбранного направления
     // проверим не вышли за границы
-    getNewRowColCell (cell, way, step) {
+    getNewRowColCell: function (cell, way, step) {
         // cell.positionRow
         // cell.positionCol
         
-        return function (cell, way, step) {
-            
-        }
-    }
+        console.log(cell);
+        
+        
+        // return function (cell, way, step) {
+        //    
+        // }
+    },
 
     // Просчитаем маршрут наверное ))
-    calculateRoute(steps, callBack) {
+    calculateRoute: function(steps, callBack) {
         callBack(route);
     }
 

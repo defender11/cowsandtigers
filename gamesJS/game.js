@@ -33,16 +33,20 @@ export default class Game {
         // Создадим игровое поле на сцене
         if (scene.build()) {
 
-            scene.plain.innerHTML = "<p class='b-title__text'>Игра загружена.</p> " +
-                "<br />" +
-                "<p class='b-title__text'>Нажмите 'Начать игру'.</p>";
+            $('body').lNotify('add','Игра загружена.', 'success');
+            $('body').lNotify('add',"Нажмите 'Начать игру'.", 'success');
 
             // return false;
             let self = this;
             let loop;
 
             if (!this.devMode) {
+
+                $('body').lNotify('add','Игра в обычном режиме.', 'success');
+
                 this.btnStart.addEventListener('click', function () {
+
+                    $('body').lNotify('add','Игра запущена.', 'success');
                     // Главный Loop
                     loop = setInterval(function (callback) {
                         if (scene.issetObjectOnMap()) {
@@ -58,13 +62,18 @@ export default class Game {
 
                 this.btnPause.addEventListener('click', function () {
                     clearInterval(loop);
+
+                    $('body').lNotify('add','Игра остановлена.', 'success');
                 });
             } else {
                 if (scene.issetObjectOnMap()) {
+                    $('body').lNotify('add','Игра в режиме разработчика.', 'success');
+
                     scene.dieManager();
                     scene.actionOnMap();
                     scene.render();
                 } else {
+                    $('body').lNotify('add','Конец игры.', 'success');
                     self.gameOver();
                 }
             }

@@ -260,3 +260,82 @@ html {
     text-decoration: none;
     align-content: center;
 }
+
+/* LNOTIFY */
+.b-lNotify {
+    display: flex;
+    position: fixed;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    bottom: 0;
+    right: 0;
+}
+.b-lNotify .b-lNotify_message.b-lNotify_message_success,
+.b-lNotify .b-lNotify_message.b-lNotify_message_error {
+    display: block;
+    position: relative;
+    margin: 10px;
+    padding: 9px 30px 8px 10px;
+
+    background: #452c16;
+    border: 1px solid #333;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+
+    -webkit-box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
+    -moz-box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
+    box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
+}
+
+.b-lNotify .b-lNotify_message.b-lNotify_message_success .b-lNotify_message_text,
+.b-lNotify .b-lNotify_message.b-lNotify_message_error .b-lNotify_message_text {
+    display: block;
+    position: relative;
+
+    font: bold 14px/20px Tahoma, Arial, sans-serif;
+
+    letter-spacing: 2px;
+}
+
+.b-lNotify .b-lNotify_message.b-lNotify_message_error .b-lNotify_message_text a,
+.b-lNotify .b-lNotify_message.b-lNotify_message_success .b-lNotify_message_text a {
+    display: inline-block;
+    position: relative;
+
+    color: #5abcfb;
+    font: bold 12px/20px Tahoma, Arial, sans-serif;
+}
+
+.b-lNotify .b-lNotify_message.b-lNotify_message_success .b-lNotify_message_close,
+.b-lNotify .b-lNotify_message.b-lNotify_message_error .b-lNotify_message_close {
+    display: block;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font: bold 12px/20px Tahoma, Arial, sans-serif;
+    text-decoration: none;
+
+    background: #452c16;
+    color: #a7a4a4;;
+
+    -webkit-box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
+    -moz-box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
+    box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
+    padding: 0px 5px;
+}
+
+.b-lNotify .b-lNotify_message.b-lNotify_message_success .b-lNotify_message_close:hover,
+.b-lNotify .b-lNotify_message.b-lNotify_message_error .b-lNotify_message_close:hover {
+    -webkit-box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
+    -moz-box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
+    box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
+}
+
+.b-lNotify .b-lNotify_message.b-lNotify_message_success .b-lNotify_message_text {
+    color: #ffffff;
+}
+.b-lNotify .b-lNotify_message.b-lNotify_message_error .b-lNotify_message_text {
+    color: #ff8d8d;
+}

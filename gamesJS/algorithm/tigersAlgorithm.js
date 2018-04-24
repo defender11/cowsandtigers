@@ -2,10 +2,16 @@ import Algorithm from './algorithm';
 import Entity from './../entity';
 import DieUnit from './../dieUnit';
 import tools from './../tools';
+import Route from './route';
 
 // TIGERS ALGORITM
 export default class TigersAlgorithm extends Algorithm {
     act (unit, map, indexObject) {
+
+        Route.calculate(map, unit, indexObject, 4, function (data) {
+
+        });
+
 
         // let data = this.getAllNeighboringsCellInformation(unit, map, indexObject);
 
@@ -18,21 +24,18 @@ export default class TigersAlgorithm extends Algorithm {
          * Массив с Землёй              - data.neighboringsCellWithGround
          */
 
-        if (unit.health > 0) {
-             this.route(map, unit, indexObject, steps, function (routeData) {
-                 console.log(routeData);
-                 //     // Проверим есть рядом еда
-                 // if (data.neighboringsCellWithFood.length > 0) {
-                 //     this.moveToFood(map, unit, data.neighboringsCellWithFood, indexObject);
-                 // }
-                 // else if (data.neighboringsCellWithGround.length > 0) {
-                 //     this.moveFree(map, unit, data.neighboringsCellWithGround, indexObject);
-                 // }
-             });
-         }
-         // else {
-         //     map.killUnit(unit, indexObject);
-         // }
+       /* if (unit.health > 0) {
+            //     // Проверим есть рядом еда
+            if (data.neighboringsCellWithFood.length > 0) {
+                this.moveToFood(map, unit, data.neighboringsCellWithFood, indexObject);
+            }
+            else if (data.neighboringsCellWithGround.length > 0) {
+                this.moveFree(map, unit, data.neighboringsCellWithGround, indexObject);
+            }
+        }
+        else {
+            map.killUnit(unit, indexObject);
+        }*/
     };
 
     /**
