@@ -56,17 +56,56 @@ export default {
             rowRight,
             colRight,
             countRow = 0,
-            countCol = 0;
+            countCol = 0,
+            issetTopAnglePoint = false;
 
         // Получим позицию левого верхнего угла unit
-        row = (positionRow - step) < 0 ? 0 : positionRow - step;
-        col = (positionCol - step) < 0 ? 0 : positionCol - step;
+        row = (positionRow - step) <= 0 ? 0 : positionRow - step;
+        col = (positionCol - step) <= 0 ? 0 : positionCol - step;
 
-        // Получим позицию правого верхнего угла unit,
-        // для подсчета дистанции от левого до правого угла
-        colRight = (positionCol + step) > this.mapCol ? this.mapCol : positionCol + step;
+        // если вычесляемая позиция == позиций Unit,
+        // Мы в левом верхнем углу и тогда верхнего ряда вообще нет
+        if (
+            positionRow == row
+            &&
+            positionCol == col
+        ) {
+            // мы в левом верхнем углу
+            // тогда левой стороны вообще нет
+            // верха тоже нет
+            return {
+                positionRow: row,
+                // Проверим не вышли за левую часть границы карты
+                positionCol: col,
+                countRow: countRow,
+                countCol: countCol,
+                issetAnglePoint: issetTopAnglePoint
+            }
+        }
 
-        countCol = (colRight - col) + 1;
+
+
+        // Если строка выше верхнего края, то ряда нет
+        if (positionRow - step >= 0) {
+            issetTopAnglePoint = true;
+
+            // если вычесляемая позиция == позиций Unit,
+            // Мы в Левом верхнем углу и тогда верхнего ряда вообще нет
+            if (
+                positionRow == row
+                &&
+                positionCol == col
+            ) {
+                issetTopAnglePoint = false;
+            }
+            else {
+                // Получим позицию правого верхнего угла unit,
+                // для подсчета дистанции от левого до правого угла
+                colRight = (positionCol + step) > this.mapCol ? this.mapCol : positionCol + step;
+
+                countCol = (colRight - col) + 1;
+            }
+        }
 
         return {
             positionRow: row,
@@ -74,6 +113,7 @@ export default {
             positionCol: col,
             countRow: countRow,
             countCol: countCol,
+            issetAnglePoint: issetTopAnglePoint
         }
     },
     getRightTopAnglePoint: function(step, positionRow, positionCol) {
@@ -82,22 +122,62 @@ export default {
             rowBottom,
             colBottom,
             countRow = 0,
-            countCol = 0;
+            countCol = 0,
+            issetTopAnglePoint = false;
 
         // Получим позицию правого верхнего угла unit
-        row = positionRow - step;
-        col = (positionCol + step) > this.mapCol ? this.mapCol : positionCol + step;
+        row = (positionRow - step) <= 0 ? 0 : positionRow - step;
+        col = (positionCol + step) >= this.mapCol ? this.mapCol : positionCol + step;
 
-        // Получим позицию правого угла unit,
-        // для подсчета дистанции от левого до правого угла
-        // {
-        //     positionRow: positionRow + step,
-        //     positionCol: positionCol + step,
+        // если вычесляемая позиция == позиций Unit,
+        // Мы в правом верхнем углу и тогда верхнего ряда вообще нет
+        if (
+            positionRow == row
+            &&
+            positionCol == col
+        ) {
+            // мы в правом верхнем углу
+            // тогда правой стороны вообще нет
+            // верха тоже нет
+            return {
+                positionRow: row,
+                // Проверим не вышли за левую часть границы карты
+                positionCol: col,
+                countRow: countRow,
+                countCol: countCol,
+                issetAnglePoint: issetTopAnglePoint
+            }
+        }
+
+
+
+/*
+
+        // while(row < 0) {
+        //     row++;
         // }
-        rowBottom = (positionRow + step) > this.mapRow ? this.mapRow : positionRow + step;
-        colBottom = (positionCol + step) > this.mapCol ? this.mapCol : positionCol + step;
 
-        countCol = (colRight - col) + 1;
+        // Если строка выше верхнего края, то ряда нет
+        if (row >= 0) {
+            issetTopAnglePoint = true;
+
+            // если вычесляемая позиция == позиций Unit,
+            // Мы в правом верхнем углу и тогда верхнего ряда вообще нет
+            if (
+                positionRow == row
+                &&
+                positionCol == col
+            ) {
+                issetTopAnglePoint = false;
+            }
+            else {
+                // Получим позицию правого верхнего угла unit,
+                // для подсчета дистанции от левого до правого угла
+                colRight = (positionCol + step) > this.mapCol ? this.mapCol : positionCol + step;
+
+                countCol = (colRight - col) + 1;
+            }
+        }
 
         return {
             positionRow: row,
@@ -105,9 +185,34 @@ export default {
             positionCol: col,
             countRow: countRow,
             countCol: countCol,
+            issetAnglePoint: issetTopAnglePoint
+        }
+
+
+        // Получим позицию правого верхнего угла unit,
+        // для подсчета дистанции от левого до правого угла
+        colRight = (positionCol + step) > this.mapCol ? this.mapCol : positionCol + step;
+
+        countCol = (colRight - col) + 1;
+
+        // Проверим сущевствование верхнего ряда
+        if (positionCol == col) {
+            issetTopAnglePoint = false;
+        }
+*/
+
+        return {
+            positionRow: row,
+            // Проверим не вышли за левую часть границы карты
+            positionCol: col,
+            countRow: countRow,
+            countCol: countCol,
+            issetAnglePoint: issetTopAnglePoint
         }
     },
-    getRightBottomAnglePoint: function(step, positionRow, positionCol) {},
+    getRightBottomAnglePoint: function(step, positionRow, positionCol) {
+
+    },
     getLeftBottomAnglePoint: function(step, positionRow, positionCol) {},
 
     /**
