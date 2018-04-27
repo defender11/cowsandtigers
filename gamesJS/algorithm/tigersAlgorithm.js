@@ -7,12 +7,6 @@ import tools from './../tools';
 export default class TigersAlgorithm extends Algorithm {
     act (unit, map, indexObject) {
 
-        console.log(
-            this.way(map, unit, indexObject, function (data) {
-
-            })
-        );
-
         // let data = this.getAllNeighboringsCellInformation(unit, map, indexObject);
 
         /**
@@ -24,18 +18,21 @@ export default class TigersAlgorithm extends Algorithm {
          * Массив с Землёй              - data.neighboringsCellWithGround
          */
 
-       /* if (unit.health > 0) {
-            //     // Проверим есть рядом еда
-            if (data.neighboringsCellWithFood.length > 0) {
-                this.moveToFood(map, unit, data.neighboringsCellWithFood, indexObject);
-            }
-            else if (data.neighboringsCellWithGround.length > 0) {
-                this.moveFree(map, unit, data.neighboringsCellWithGround, indexObject);
-            }
-        }
-        else {
-            map.killUnit(unit, indexObject);
-        }*/
+        if (unit.health > 0) {
+             this.route(map, unit, indexObject, steps, function (routeData) {
+                 console.log(routeData);
+                 //     // Проверим есть рядом еда
+                 // if (data.neighboringsCellWithFood.length > 0) {
+                 //     this.moveToFood(map, unit, data.neighboringsCellWithFood, indexObject);
+                 // }
+                 // else if (data.neighboringsCellWithGround.length > 0) {
+                 //     this.moveFree(map, unit, data.neighboringsCellWithGround, indexObject);
+                 // }
+             });
+         }
+         // else {
+         //     map.killUnit(unit, indexObject);
+         // }
     };
 
     /**
