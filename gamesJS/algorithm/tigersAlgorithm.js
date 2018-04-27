@@ -6,10 +6,18 @@ import Route from './route';
 
 // TIGERS ALGORITM
 export default class TigersAlgorithm extends Algorithm {
+    constructor() {
+        super();
+
+        // Cell Distance
+        this.distanceView = 2;
+    }
+
     act (unit, map, indexObject) {
 
-        Route.calculate(map, unit, indexObject, 4, function (data) {
-
+        Route.getNeighboringsCellInformation(map, unit, indexObject, this.distanceView, function (data) {
+            // Воозвратить объект с соседними ячейками
+            console.log(data);
         });
 
 

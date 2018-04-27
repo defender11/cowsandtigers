@@ -5,6 +5,11 @@ import tools from './../tools';
 
 // COWS ALGORITM
 export default class CowsAlgorithm  extends Algorithm {
+    constructor() {
+        super();
+        // Cell Distance
+        this.distanceView = 1;
+    }
 
     act (unit, map, indexObject) {
 

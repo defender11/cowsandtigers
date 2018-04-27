@@ -33,8 +33,8 @@ export default class Game {
         // Создадим игровое поле на сцене
         if (scene.build()) {
 
-            $('body').lNotify('add','Игра загружена.', 'success');
-            $('body').lNotify('add',"Нажмите 'Начать игру'.", 'success');
+            $.lNotify('add','Игра загружена.', 'success');
+            $.lNotify('add',"Нажмите 'Начать игру'.", 'success');
 
             // return false;
             let self = this;
@@ -42,11 +42,11 @@ export default class Game {
 
             if (!this.devMode) {
 
-                $('body').lNotify('add','Игра в обычном режиме.', 'success');
+                $.lNotify('add','Игра в обычном режиме.', 'success');
 
                 this.btnStart.addEventListener('click', function () {
 
-                    $('body').lNotify('add','Игра запущена.', 'success');
+                    $.lNotify('add','Игра запущена.', 'success');
                     // Главный Loop
                     loop = setInterval(function (callback) {
                         if (scene.issetObjectOnMap()) {
@@ -63,17 +63,17 @@ export default class Game {
                 this.btnPause.addEventListener('click', function () {
                     clearInterval(loop);
 
-                    $('body').lNotify('add','Игра остановлена.', 'success');
+                    $.lNotify('add','Игра остановлена.', 'success');
                 });
             } else {
                 if (scene.issetObjectOnMap()) {
-                    $('body').lNotify('add','Игра в режиме разработчика.', 'success');
+                    $.lNotify('add','Игра в режиме разработчика.', 'success');
 
                     scene.dieManager();
                     scene.actionOnMap();
                     scene.render();
                 } else {
-                    $('body').lNotify('add','Конец игры.', 'success');
+                    $.lNotify('add','Конец игры.', 'success');
                     self.gameOver();
                 }
             }
