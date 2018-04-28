@@ -129,7 +129,7 @@ export default {
         row = (positionRow - step) <= 0 ? 0 : positionRow - step;
         col = (positionCol + step) >= this.mapCol ? this.mapCol : positionCol + step;
 
-        // если вычесляемая позиция == позиций Unit,
+        // если результат позиций == позиций Unit,
         // Мы в правом верхнем углу и тогда верхнего ряда вообще нет
         if (
             positionRow == row
@@ -139,6 +139,72 @@ export default {
             // мы в правом верхнем углу
             // тогда правой стороны вообще нет
             // верха тоже нет
+
+            /*// попробуем посмотреть в лево от тек.позиции
+            if (
+                (((positionCol + step) - 1) <= this.mapCol)
+                &&
+                ((positionRow - step) >= 0)
+            ) {
+                issetTopAnglePoint = true;
+
+                // получим коодринаты ячейки с лева
+                row = positionRow - step;
+                col = (positionCol + step) - 1;
+
+            }
+
+            // Если с лева  мы за пределами карты, попробуем посмотреть в низ
+            if (!issetTopAnglePoint) {
+                if (
+                    ((positionCol + step) <= this.map)
+                    &&
+                    ((positionRow + step) >= 0)
+                ) {
+                    issetTopAnglePoint = true;
+                }
+            }*/
+
+
+            return {
+                positionRow: row,
+                positionCol: col,
+                countRow: countRow,
+                countCol: countCol,
+                issetAnglePoint: issetTopAnglePoint
+            }
+        }
+
+        // ячейка за приделами границы карты
+        if (
+            (positionRow - step) < 0 &&
+            (positionCol + step) > this.mapCol
+        ) {
+
+            // посмотрем что с лева от ячейки
+            if (
+                (positionRow - step) >= 0 &&
+                ((positionCol + step) - 1) <= this.mapCol
+            ) {
+                issetTopAnglePoint = true;
+
+                row = positionRow - step;
+                col = (positionCol + step) - 1;
+            }
+
+            // Если с лева ячейки нет, посмотрим что в низу на step
+            if (!issetTopAnglePoint) {
+                if (
+                    ((positionRow - step) + 1) >= 0 &&
+                    (positionCol + step) <= this.mapCol
+                ) {
+
+                    issetTopAnglePoint = true;
+
+                    row = (positionRow - step) + 1;
+                    col = positionCol + step;
+                }
+            }
             return {
                 positionRow: row,
                 // Проверим не вышли за левую часть границы карты
@@ -148,7 +214,6 @@ export default {
                 issetAnglePoint: issetTopAnglePoint
             }
         }
-
 
 
 /*
