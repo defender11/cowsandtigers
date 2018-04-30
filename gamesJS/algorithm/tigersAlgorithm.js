@@ -9,17 +9,15 @@ export default class TigersAlgorithm extends Algorithm {
     constructor() {
         super();
 
-        // Cell Distance
-        this.distanceView = 2;
+        // Радиус ячеек в четыре стороны, увеличен на одну, если 4 то 3
+        this.distanceView = 4;
     }
 
     act (unit, map, indexObject) {
+        // Воозвратить объект с соседними ячейками
+        let neighboringsCellInformation = Route.getNeighboringsCellInformation(map, unit, indexObject, this.distanceView);
 
-        Route.getNeighboringsCellInformation(map, unit, indexObject, this.distanceView, function (data) {
-            // Воозвратить объект с соседними ячейками
-            console.log(data);
-        });
-
+        console.log(neighboringsCellInformation);
 
         // let data = this.getAllNeighboringsCellInformation(unit, map, indexObject);
 
