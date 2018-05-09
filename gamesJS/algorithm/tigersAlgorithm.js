@@ -17,7 +17,7 @@ export default class TigersAlgorithm extends Algorithm {
         // Воозвратить объект с соседними ячейками
         let neighboringsCellInformation = Route.getNeighboringsCellInformation(map, unit, indexObject, this.distanceView);
 
-        console.log(neighboringsCellInformation);
+        console.log("NEIGHBORINGSCELLINFORMATION: ", neighboringsCellInformation);
 
         // let data = this.getAllNeighboringsCellInformation(unit, map, indexObject);
 

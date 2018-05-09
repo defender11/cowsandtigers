@@ -35,7 +35,11 @@ export default class Scene {
         for (let positionRow = 0; positionRow < this.map.row; positionRow++) {
             mapHTML += "<div class='row'>";
             for (let positionCol = 0; positionCol < this.map.col; positionCol++) {
-                mapHTML += "<div class='cell'> " + this.map.getCell(positionRow, positionCol).show() + "</div>";
+
+                // DEV MODE
+                let cellCoordinate = "<div class='cellCoordinate'>" + positionRow + " : " + positionCol + "</div>";
+
+                mapHTML += "<div class='cell'>" + cellCoordinate + " " + this.map.getCell(positionRow, positionCol).show() + "</div>";
             }
             mapHTML += "</div>";
         }
