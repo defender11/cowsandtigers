@@ -126,11 +126,14 @@ export default {
         let neighboringsCellInfo = [];
 
         let startCellRow = param.unitSide.angleStart.positionRow;
+        let endCellCol = param.unitSide.angleEnd.positionCol;
 
         //mapCol
-        for (let startCellCol = param.unitSide.angleStart.positionCol; startCellCol <= (param.unitSide.angleEnd.positionCol - 1); startCellCol++) {
+        for (let startCellCol = param.unitSide.angleStart.positionCol; startCellCol < endCellCol; startCellCol++) {
 
-            if (startCellRow !== param.unitPositionRow && param.unitPositionCol !== startCellCol) {
+            if ((startCellRow === param.unitPositionRow && startCellCol === param.unitPositionCol)) {
+                return;
+            } else {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
 
@@ -142,11 +145,14 @@ export default {
         let neighboringsCellInfo = [];
 
         let startCellCol = param.unitSide.angleStart.positionCol;
+        let endCellRow = param.unitSide.angleEnd.positionRow;
 
         // mapRow
-        for (let startCellRow = param.unitSide.angleStart.positionRow; startCellRow <= (param.unitSide.angleEnd.positionRow - 1); startCellRow++) {
+        for (let startCellRow = param.unitSide.angleStart.positionRow; startCellRow < endCellRow; startCellRow++) {
 
-            if (startCellRow !== param.unitPositionRow && param.unitPositionCol !== startCellCol) {
+            if ((startCellRow === param.unitPositionRow && startCellCol === param.unitPositionCol)) {
+                return;
+            } else {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
         }
@@ -157,11 +163,14 @@ export default {
         let neighboringsCellInfo = [];
 
         let startCellRow = param.unitSide.angleStart.positionRow;
+        let endCellCol = param.unitSide.angleEnd.positionCol;
 
         //mapCol
-        for (let startCellCol = param.unitSide.angleStart.positionCol; startCellCol >= (param.unitSide.angleEnd.positionCol + 1); startCellCol--) {
+        for (let startCellCol = param.unitSide.angleStart.positionCol; startCellCol > endCellCol; startCellCol--) {
 
-            if (startCellRow !== param.unitPositionRow && param.unitPositionCol !== startCellCol) {
+            if ((startCellRow === param.unitPositionRow && startCellCol === param.unitPositionCol)) {
+                return;
+            } else {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
         }
@@ -172,11 +181,14 @@ export default {
         let neighboringsCellInfo = [];
 
         let startCellCol = param.unitSide.angleStart.positionCol;
+        let endCellRow = param.unitSide.angleEnd.positionRow;
 
         // mapRow
-        for (let startCellRow = param.unitSide.angleStart.positionRow; startCellRow >= (param.unitSide.angleEnd.positionRow + 1); startCellRow--) {
+        for (let startCellRow = param.unitSide.angleStart.positionRow; startCellRow > endCellRow; startCellRow--) {
 
-            if (startCellRow !== param.unitPositionRow && param.unitPositionCol !== startCellCol) {
+            if ((startCellRow === param.unitPositionRow && startCellCol === param.unitPositionCol)) {
+                return;
+            } else {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
         }
