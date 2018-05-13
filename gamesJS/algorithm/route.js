@@ -4,7 +4,7 @@ import tools from "../tools";
 export default {
     mapRow: 0,
     mapCol: 0,
-    DEBUG: true,
+    DEBUG: false,
 
     getNeighboringsCellInformation: function (map, unit, indexObject, steps, callBackUnitRoute) {
 
@@ -38,7 +38,7 @@ export default {
         return neighboringsCellInformation;
     },
 
-    // Получим инфо соседних ячеек на кадой иттерации
+    // Получим инфо соседних ячеек на каждой иттерации
     getNeighboringsCell: function (step, unit, map) {
         let neighboringsCellInfo = [];
 
@@ -69,6 +69,7 @@ export default {
                     console.log("|--- START side: " + unitSides[side].name);
                     console.log("|--- side: ", unitSides[side]);
                 }
+                console.log("|--- side: ", unitSides[side]);
 
                 let param = {
                     unitSide: unitSides[side],
@@ -82,21 +83,21 @@ export default {
                     // leftTop_TO_rightTop
                     case 0:
                         let leftTop_TO_rightTop = this.getTopSideNeighboringsCell(param);
-                        if (leftTop_TO_rightTop.length > 0) {
+                        if (leftTop_TO_rightTop !== undefined) {
                             neighboringsCellInfo.push(leftTop_TO_rightTop);
                         }
                         break;
                     // rightTop_TO_rightBottom
                     case 1:
                         let rightTop_TO_rightBottom = this.getRighttSideNeighboringsCell(param);
-                        if (rightTop_TO_rightBottom.length > 0) {
+                        if (rightTop_TO_rightBottom !== undefined) {
                             neighboringsCellInfo.push(rightTop_TO_rightBottom);
                         }
                         break;
                     // rightBottom_TO_leftBottom
                     case 2:
                         let rightBottom_TO_leftBottom = this.getBottomSideNeighboringsCell(param);
-                        if (rightBottom_TO_leftBottom.length > 0) {
+                        if (rightBottom_TO_leftBottom !== undefined) {
                             neighboringsCellInfo.push(rightBottom_TO_leftBottom);
                         }
                         break;
@@ -104,7 +105,7 @@ export default {
                     // leftBottom_TO_leftTop
                     case 3:
                         let leftBottom_TO_leftTop = this.getLeftSideNeighboringsCell(param);
-                        if (leftBottom_TO_leftTop.length > 0) {
+                        if (leftBottom_TO_leftTop !== undefined) {
                             neighboringsCellInfo.push(leftBottom_TO_leftTop);
                         }
                         break;
@@ -122,6 +123,8 @@ export default {
 
     //    -----------------------------------------------------------------------------------------------
 
+    // ????????????????????????????????
+
     getTopSideNeighboringsCell: function (param) {
         let neighboringsCellInfo = [];
 
@@ -131,9 +134,7 @@ export default {
         //mapCol
         for (let startCellCol = param.unitSide.angleStart.positionCol; startCellCol < endCellCol; startCellCol++) {
 
-            if ((startCellRow === param.unitPositionRow && startCellCol === param.unitPositionCol)) {
-                return;
-            } else {
+            if (startCellRow !== param.unitPositionRow && startCellCol !== param.unitPositionCol) {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
 
@@ -146,13 +147,12 @@ export default {
 
         let startCellCol = param.unitSide.angleStart.positionCol;
         let endCellRow = param.unitSide.angleEnd.positionRow;
-
         // mapRow
         for (let startCellRow = param.unitSide.angleStart.positionRow; startCellRow < endCellRow; startCellRow++) {
 
-            if ((startCellRow === param.unitPositionRow && startCellCol === param.unitPositionCol)) {
-                return;
-            } else {
+            console.log('startCellRow < endCellRow: ', startCellRow, endCellRow);
+
+            if (startCellRow !== param.unitPositionRow && startCellCol !== param.unitPositionCol) {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
         }
@@ -168,9 +168,7 @@ export default {
         //mapCol
         for (let startCellCol = param.unitSide.angleStart.positionCol; startCellCol > endCellCol; startCellCol--) {
 
-            if ((startCellRow === param.unitPositionRow && startCellCol === param.unitPositionCol)) {
-                return;
-            } else {
+            if (startCellRow !== param.unitPositionRow && startCellCol !== param.unitPositionCol) {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
         }
@@ -186,15 +184,16 @@ export default {
         // mapRow
         for (let startCellRow = param.unitSide.angleStart.positionRow; startCellRow > endCellRow; startCellRow--) {
 
-            if ((startCellRow === param.unitPositionRow && startCellCol === param.unitPositionCol)) {
-                return;
-            } else {
+            if (startCellRow !== param.unitPositionRow && startCellCol !== param.unitPositionCol) {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
         }
 
         return neighboringsCellInfo;
     },
+
+    // ????????????????????????????????
+
 
     /**
      * Получим координаты 4-х соторон на основе Unit
@@ -339,23 +338,12 @@ export default {
     },
 
     getLeftTopAnglePoint: function (step, positionRow, positionCol) {
-        let newPosition;
         let newPositionRow = positionRow - step;
         let newPositionCol = positionCol - step;
         let angleIsset = true;
 
-        if (
-            ((newPositionRow < 0) || (newPositionRow > (this.mapRow - 1)))
-            ||
-            ((newPositionCol < 0) || (newPositionCol > (this.mapCol - 1)))
-            ||
-            (
-                ((newPositionRow < 0) || (newPositionRow > (this.mapRow - 1)))
-                &&
-                ((newPositionCol < 0) || (newPositionCol > (this.mapCol - 1)))
-            )
-        ) {
-            newPosition = this.findNewAngel(step, newPositionRow, newPositionCol);
+        if (this.isUnitOutOfBorder(newPositionRow, newPositionCol)) {
+            let newPosition = this.findNewAngel(step, newPositionRow, newPositionCol);
 
             if (this.DEBUG) {
                 console.log('|-|- newPosition: ', newPosition);
@@ -380,17 +368,7 @@ export default {
         let newPositionCol = positionCol + step;
         let angleIsset = true;
 
-        if (
-            (newPositionRow < 0 || newPositionRow > (this.mapRow - 1))
-            ||
-            (newPositionCol < 0 || newPositionCol > (this.mapCol - 1))
-            ||
-            (
-                (newPositionRow < 0 || newPositionRow > (this.mapRow - 1))
-                &&
-                (newPositionCol < 0 || newPositionCol > (this.mapCol - 1))
-            )
-        ) {
+        if (this.isUnitOutOfBorder(newPositionRow, newPositionCol)) {
             let newPosition = this.findNewAngel(step, newPositionRow, newPositionCol);
 
             if (newPosition.isFind) {
@@ -412,17 +390,7 @@ export default {
         let newPositionCol = positionCol + step;
         let angleIsset = true;
 
-        if (
-            (newPositionRow < 0 || newPositionRow > (this.mapRow - 1))
-            ||
-            (newPositionCol < 0 || newPositionCol > (this.mapCol - 1))
-            ||
-            (
-                (newPositionRow < 0 || newPositionRow > (this.mapRow - 1))
-                &&
-                (newPositionCol < 0 || newPositionCol > (this.mapCol - 1))
-            )
-        ) {
+        if (this.isUnitOutOfBorder(newPositionRow, newPositionCol)) {
             let newPosition = this.findNewAngel(step, newPositionRow, newPositionCol);
 
             if (newPosition.isFind) {
@@ -444,17 +412,7 @@ export default {
         let newPositionCol = positionCol - step;
         let angleIsset = true;
 
-        if (
-            (newPositionRow < 0 || newPositionRow > (this.mapRow - 1))
-            ||
-            (newPositionCol < 0 || newPositionCol > (this.mapCol - 1))
-            ||
-            (
-                (newPositionRow < 0 || newPositionRow > (this.mapRow - 1))
-                &&
-                (newPositionCol < 0 || newPositionCol > (this.mapCol - 1))
-            )
-        ) {
+        if (this.isUnitOutOfBorder(newPositionRow, newPositionCol)) {
             let newPosition = this.findNewAngel(step, newPositionRow, newPositionCol);
 
             if (newPosition.isFind) {
@@ -470,6 +428,23 @@ export default {
             positionCol: newPositionCol,
             isset: angleIsset
         }
+    },
+    isUnitOutOfBorder: function (newPositionRow, newPositionCol) {
+        if (
+            (newPositionRow < 0 || newPositionRow > (this.mapRow - 1))
+            ||
+            (newPositionCol < 0 || newPositionCol > (this.mapCol - 1))
+            ||
+            (
+                (newPositionRow < 0 || newPositionRow > (this.mapRow - 1))
+                &&
+                (newPositionCol < 0 || newPositionCol > (this.mapCol - 1))
+            )
+        ) {
+            return true;
+        }
+
+        return false;
     },
 
     // Попробуем найти новую ячейку прибавив значение шага
