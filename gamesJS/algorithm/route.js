@@ -6,7 +6,7 @@ export default {
     mapCol: 0,
     DEBUG: false,
 
-    getNeighboringsCellInformation: function (map, unit, indexObject, steps, callBackUnitRoute) {
+    getNeighboringsCellInformation: function (map, unit, indexObject, steps) {
 
         if (this.DEBUG) {
             console.log(map.mapData);
@@ -123,22 +123,24 @@ export default {
 
     //    -----------------------------------------------------------------------------------------------
 
-    // ????????????????????????????????
-
+    /* Получим содержимое ячеек по сторонам */
     getTopSideNeighboringsCell: function (param) {
         let neighboringsCellInfo = [];
 
         let startCellRow = param.unitSide.angleStart.positionRow;
         let endCellCol = param.unitSide.angleEnd.positionCol;
 
-        //mapCol
-        for (let startCellCol = param.unitSide.angleStart.positionCol; startCellCol < endCellCol; startCellCol++) {
+        let startCellCol = param.unitSide.angleStart.positionCol;
 
-            if (startCellRow !== param.unitPositionRow && startCellCol !== param.unitPositionCol) {
+        do {
+            let unitPositionCell = parseInt(param.unitPositionRow + '' + param.unitPositionCol);
+            let selectPositionCell = parseInt(startCellRow + '' + startCellCol);
+
+            if (unitPositionCell !== selectPositionCell) {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
-
-        }
+            startCellCol++;
+        } while (startCellCol < endCellCol);
 
         return neighboringsCellInfo;
     },
@@ -147,15 +149,18 @@ export default {
 
         let startCellCol = param.unitSide.angleStart.positionCol;
         let endCellRow = param.unitSide.angleEnd.positionRow;
-        // mapRow
-        for (let startCellRow = param.unitSide.angleStart.positionRow; startCellRow < endCellRow; startCellRow++) {
 
-            console.log('startCellRow < endCellRow: ', startCellRow, endCellRow);
+        let startCellRow = param.unitSide.angleStart.positionRow;
 
-            if (startCellRow !== param.unitPositionRow && startCellCol !== param.unitPositionCol) {
+        do {
+            let unitPositionCell = parseInt(param.unitPositionRow + '' + param.unitPositionCol);
+            let selectPositionCell = parseInt(startCellRow + '' + startCellCol);
+
+            if (unitPositionCell !== selectPositionCell) {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
-        }
+            startCellRow++;
+        } while (startCellRow < endCellRow);
 
         return neighboringsCellInfo;
     },
@@ -165,13 +170,17 @@ export default {
         let startCellRow = param.unitSide.angleStart.positionRow;
         let endCellCol = param.unitSide.angleEnd.positionCol;
 
-        //mapCol
-        for (let startCellCol = param.unitSide.angleStart.positionCol; startCellCol > endCellCol; startCellCol--) {
+        let startCellCol = param.unitSide.angleStart.positionCol;
 
-            if (startCellRow !== param.unitPositionRow && startCellCol !== param.unitPositionCol) {
+        do {
+            let unitPositionCell = parseInt(param.unitPositionRow + '' + param.unitPositionCol);
+            let selectPositionCell = parseInt(startCellRow + '' + startCellCol);
+
+            if (unitPositionCell !== selectPositionCell) {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
-        }
+            startCellCol--;
+        } while (startCellCol > endCellCol);
 
         return neighboringsCellInfo;
     },
@@ -181,19 +190,20 @@ export default {
         let startCellCol = param.unitSide.angleStart.positionCol;
         let endCellRow = param.unitSide.angleEnd.positionRow;
 
-        // mapRow
-        for (let startCellRow = param.unitSide.angleStart.positionRow; startCellRow > endCellRow; startCellRow--) {
+        let startCellRow = param.unitSide.angleStart.positionRow;
 
-            if (startCellRow !== param.unitPositionRow && startCellCol !== param.unitPositionCol) {
+        do {
+            let unitPositionCell = parseInt(param.unitPositionRow + '' + param.unitPositionCol);
+            let selectPositionCell = parseInt(startCellRow + '' + startCellCol);
+
+            if (unitPositionCell !== selectPositionCell) {
                 neighboringsCellInfo.push(param.map.getCell(startCellRow, startCellCol));
             }
-        }
+            startCellRow--;
+        } while (startCellRow > endCellRow);
 
         return neighboringsCellInfo;
     },
-
-    // ????????????????????????????????
-
 
     /**
      * Получим координаты 4-х соторон на основе Unit
