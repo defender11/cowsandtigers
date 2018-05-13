@@ -26,12 +26,18 @@ export default {
             }
 
             // console.log('|- step: ' + step);
-            
+
             let neighboringsCell = this.getNeighboringsCell(step, unit, map);
 
             if (neighboringsCell.length > 0) {
+
+                let param = {
+                    // Правильно назвать 
+                    step: step,
+                    cellsInfo: neighboringsCell,
+                };
                 // Вот прям здесь получим
-                neighboringsCellInformation.push(neighboringsCell);
+                neighboringsCellInformation.push(param);
             }
         }
 
