@@ -275,15 +275,35 @@ html {
     position: fixed;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    bottom: 0;
-    right: 0;
 }
+
+/* !NEW POSITION LNOTIFY*/
+.b-lNotify.b-lNotify_topLeft {
+    top: 10px;
+    left: 10px;
+}
+.b-lNotify.b-lNotify_topRight {
+    top: 10px;
+    right: 10px;
+}
+.b-lNotify.b-lNotify_bottomRight {
+    bottom: 10px;
+    right: 10px;
+}
+.b-lNotify.b-lNotify_bottomLeft {
+    bottom: 10px;
+    left: 10px;
+}
+/* !NEW END POSITION LNOTIFY*/
+
+.b-lNotify .b-lNotify_message.b-lNotify_message_text,
 .b-lNotify .b-lNotify_message.b-lNotify_message_success,
 .b-lNotify .b-lNotify_message.b-lNotify_message_error {
     display: block;
     position: relative;
     margin: 10px;
     padding: 9px 30px 8px 10px;
+    max-width: 320px;
 
     background: #452c16;
     border: 1px solid #333;
@@ -297,16 +317,27 @@ html {
     box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
 }
 
+/* !NEW ANIMATION LNOTIFY*/
+.b-lNotify .b-lNotify_message.b-lNotify_message_fade {
+    display: none;
+}
+.b-lNotify .b-lNotify_message.b-lNotify_message_slide {
+    opacity: 0;
+}
+/* !NEW END ANIMATION LNOTIFY*/
+
+.b-lNotify .b-lNotify_message.b-lNotify_message_text .b-lNotify_message_text,
 .b-lNotify .b-lNotify_message.b-lNotify_message_success .b-lNotify_message_text,
 .b-lNotify .b-lNotify_message.b-lNotify_message_error .b-lNotify_message_text {
     display: block;
     position: relative;
 
-    font: bold 14px/20px Tahoma, Arial, sans-serif;
+    font: normal 14px/20px Tahoma, Arial, sans-serif;
 
     letter-spacing: 2px;
 }
 
+.b-lNotify .b-lNotify_message.b-lNotify_message_text .b-lNotify_message_text a,
 .b-lNotify .b-lNotify_message.b-lNotify_message_error .b-lNotify_message_text a,
 .b-lNotify .b-lNotify_message.b-lNotify_message_success .b-lNotify_message_text a {
     display: inline-block;
@@ -316,6 +347,7 @@ html {
     font: bold 12px/20px Tahoma, Arial, sans-serif;
 }
 
+.b-lNotify .b-lNotify_message.b-lNotify_message_text .b-lNotify_message_close,
 .b-lNotify .b-lNotify_message.b-lNotify_message_success .b-lNotify_message_close,
 .b-lNotify .b-lNotify_message.b-lNotify_message_error .b-lNotify_message_close {
     display: block;
@@ -334,6 +366,7 @@ html {
     padding: 0px 5px;
 }
 
+.b-lNotify .b-lNotify_message.b-lNotify_message_text .b-lNotify_message_close:hover,
 .b-lNotify .b-lNotify_message.b-lNotify_message_success .b-lNotify_message_close:hover,
 .b-lNotify .b-lNotify_message.b-lNotify_message_error .b-lNotify_message_close:hover {
     -webkit-box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
@@ -341,9 +374,13 @@ html {
     box-shadow: inset 0px 0px 12px -2px rgb(221, 146, 43), 0px 2px 0px 2px rgb(221, 146, 43), 0px 4px 8px 1px rgb(0, 0, 0);
 }
 
-.b-lNotify .b-lNotify_message.b-lNotify_message_success .b-lNotify_message_text {
+.b-lNotify .b-lNotify_message.b-lNotify_message_text .b-lNotify_message_text {
     color: #ffffff;
+}
+.b-lNotify .b-lNotify_message.b-lNotify_message_success .b-lNotify_message_text {
+    color: #b0ffb3;
 }
 .b-lNotify .b-lNotify_message.b-lNotify_message_error .b-lNotify_message_text {
     color: #ff8d8d;
 }
+

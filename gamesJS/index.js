@@ -5,7 +5,10 @@ import setting from "./setting";
 
 // После загрузки документа запустим игру
 $(function () {
-    $.lNotify();
+    $.lNotify({
+        animation: 'slide',
+        position: 'bottomRight'
+    });
 
     let game = new Game(setting);
 
