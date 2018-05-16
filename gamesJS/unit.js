@@ -47,7 +47,7 @@ export default class Unit extends Entity {
             unitHealth += "<div class='b-unit__health'><div class='b-healt__indicator " + classHealthColor + "' style='width: " + this.health + "%;'></div></div>";
         }
 
-        return "<div class='b-unit " + this.className + "'>" + unitHealth + "</div>";
+        return "<div class='b-unit " + this.className + " stand_still'>" + unitHealth + "</div>";
     };
 
 
