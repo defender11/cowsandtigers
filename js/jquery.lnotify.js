@@ -55,34 +55,15 @@
         },
         options;
 
-    var notify = {
-        handleCloseMsgOn: function (msgId) {
-            var self = this;
-            var $blockInfo = $('.b-lNotify');
-            var $addedMsg = $blockInfo.find('#' + msgId);
-            var btnClose = $addedMsg.find('.b-lNotify_message_close');
+    var animation = {
 
-            btnClose.on('click.handleClose' + msgId, function (e) {
-                self.closeMsg(e, msgId);
-            });
-        },
-        handleCloseMsgOff: function (e, msgId) {
-            $(e.target).off('click.handleClose' + msgId);
-        },
-
-        closeMsg: function (e, msgId) {
-            this.animationEnd($(e.target).parent('#'+msgId));
-
-            this.handleCloseMsgOff(e, msgId);
-        },
-
-        animationStart: function($msg) {
+        start: function($msg) {
             var $blockInfo = $('.b-lNotify');
 
             (options.animation === 'fade') && this.animationFadeShow($blockInfo, $msg);
             (options.animation === 'slide') && this.animationSlideShow($blockInfo, $msg);
         },
-        animationEnd: function($msg) {
+        end: function($msg) {
             (options.animation === 'fade') && this.animationFadeHide($msg);
             (options.animation === 'slide') && this.animationSlideHide($msg);
         },
@@ -154,6 +135,29 @@
 
             //
         },
+
+    };
+
+    var notify = {
+        handleCloseMsgOn: function (msgId) {
+            var self = this;
+            var $blockInfo = $('.b-lNotify');
+            var $addedMsg = $blockInfo.find('#' + msgId);
+            var btnClose = $addedMsg.find('.b-lNotify_message_close');
+
+            btnClose.on('click.handleClose' + msgId, function (e) {
+                self.closeMsg(e, msgId);
+            });
+        },
+        handleCloseMsgOff: function (e, msgId) {
+            $(e.target).off('click.handleClose' + msgId);
+        },
+
+        closeMsg: function (e, msgId) {
+            this.animationEnd($(e.target).parent('#'+msgId));
+
+            this.handleCloseMsgOff(e, msgId);
+        },
     };
 
     // Public methods
@@ -181,14 +185,14 @@
                 '<a href="javascript:void(0);" class="b-lNotify_message_close">X</a>' +
                 '</div>');
 
-            notify.animationStart($msg);
+            animation.start($msg);
 
             notify.handleCloseMsgOn(msgId);
 
             if (options.autoHide) {
                 var interval = setInterval(function () {
 
-                    notify.animationEnd($msg);
+                    animation.end($msg);
 
                     clearInterval(interval);
                 }, options.interval);

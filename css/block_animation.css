@@ -1,0 +1,35 @@
+#b-game #b-game__plain .cell .cows.stand_still {
+    background-image: url(../img/animation/cow_stand_still_sprite.png);
+
+    -webkit-animation: cows_stand_still .8s steps(10) infinite;
+    -moz-animation: cows_stand_still .8s steps(10) infinite;
+    -ms-animation: cows_stand_still .8s steps(10) infinite;
+    -o-animation: cows_stand_still .8s steps(10) infinite;
+    animation: cows_stand_still .8s steps(10) infinite;
+}
+
+
+@-webkit-keyframes cows_stand_still {
+    from { background-position:    0px; }
+    to { background-position: -2366px; }
+}
+
+@-moz-keyframes cows_stand_still {
+    from { background-position:    0px; }
+    to { background-position: -2366px; }
+}
+
+@-ms-keyframes cows_stand_still {
+    from { background-position:    0px; }
+    to { background-position: -2366px; }
+}
+
+@-o-keyframes cows_stand_still {
+    from { background-position:    0px; }
+    to { background-position: -2366px; }
+}
+
+@keyframes cows_stand_still {
+    from { background-position:    0px; }
+    to { background-position: -2366px; }
+}

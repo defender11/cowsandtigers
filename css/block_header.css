@@ -1,0 +1,36 @@
+
+/*BLOCK HEAD*/
+.b-head {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    position: relative;
+    width: 450px;
+    margin: 10px;
+}
+.b-head .b-head__logo .b-logo__img {
+    display: block;
+    width: 60px;
+    height: 60px;
+    background: url(/favicon.ico) left no-repeat;
+    background-size: cover;
+}
+.b-head .b-head__title {
+    align-self: center;
+}
+.b-head .b-head__title .b-title__text {
+    font:bold 34px/22px Tahoma, Verdana, Arial, sans-serif;
+    padding: 0;
+    margin: 0;
+    margin-left: 10px;
+    color: #a7a4a4;
+    text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.9);
+}
+.b-title__text {
+    font:bold 24px/22px Tahoma, Verdana, Arial, sans-serif;
+    padding: 0;
+    margin: 0;
+    margin-left: 10px;
+    color: #a7a4a4;
+    text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.9);
+}
