@@ -1,14 +1,14 @@
-import tools from "../tools";
+import constant from './../constant'
 
 // Route
 export default {
     mapRow: 0,
     mapCol: 0,
-    DEBUG: false,
+    LOCAL_DEBUG: false,
 
-    getNeighboringsCellInformation: function (map, unit, indexObject, steps) {
+    get: function (map, unit, indexObject, steps) {
 
-        if (this.DEBUG) {
+        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log(map.mapData);
             console.log(unit);
         }
@@ -21,7 +21,7 @@ export default {
 
         // получим инфо о четырех сторонах на дистанции полученной от Unit
         for (let step = 1; step < steps; step++) {
-            if (this.DEBUG) {
+            if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
                 console.log('|- step: ' + step);
             }
 
@@ -32,7 +32,7 @@ export default {
             if (neighboringsCell.length > 0) {
 
                 let param = {
-                    // Правильно назвать 
+                    // Правильно назвать
                     step: step,
                     cellsInfo: neighboringsCell,
                 };
@@ -48,7 +48,7 @@ export default {
     getNeighboringsCell: function (step, unit, map) {
         let neighboringsCellInfo = [];
 
-        // if (this.DEBUG) {
+        // if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
         //     unit.positionRow = 0;
         //     unit.positionCol = 2;
         // }
@@ -57,7 +57,7 @@ export default {
         // Получим координаты 4-х соторон на основе Unit
         let unitSides = this.getUnitAnglePoints(step, unit.positionRow, unit.positionCol);
 
-        if (this.DEBUG) {
+        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log("|-- unitSides", unitSides);
         }
 
@@ -71,7 +71,7 @@ export default {
                 console.log('side', side);
                 console.log('side_name', unitSides[side].name);
 
-                if (this.DEBUG) {
+                if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
                     console.log("|--- START side: " + unitSides[side].name);
                     console.log("|--- side: ", unitSides[side]);
                 }
@@ -118,7 +118,7 @@ export default {
                 }
 
 
-                if (this.DEBUG) {
+                if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
                     console.log("|--- END side: " + unitSides[side].name);
                 }
 
@@ -226,13 +226,13 @@ export default {
             rightBottom,
             leftBottom;
 
-        if (this.DEBUG) {
+        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log('|- getUnitAnglePoints: ', step, positionRow, positionCol);
         }
 
         // GET leftTop
         leftTop = this.getLeftTopAnglePoint(step, positionRow, positionCol);
-        if (this.DEBUG) {
+        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log('|-|- leftTop: ', leftTop);
         }
         if (leftTop.isset) {
@@ -262,7 +262,7 @@ export default {
 
         // GET rightTop
         rightTop = this.getRightTopAnglePoint(step, positionRow, positionCol);
-        if (this.DEBUG) {
+        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log('|-|- rightTop: ', rightTop);
         }
         if (rightTop.isset) {
@@ -292,7 +292,7 @@ export default {
 
         // GET rightBottom
         rightBottom = this.getRightBottomAnglePoint(step, positionRow, positionCol);
-        if (this.DEBUG) {
+        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log('|-|- rightBottom: ', rightBottom);
         }
         if (rightBottom.isset) {
@@ -322,7 +322,7 @@ export default {
 
         // GET leftBottom
         leftBottom = this.getLeftBottomAnglePoint(step, positionRow, positionCol);
-        if (this.DEBUG) {
+        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log('|-|- leftBottom: ', leftBottom);
         }
         if (leftBottom.isset) {
@@ -361,7 +361,7 @@ export default {
         if (this.isUnitOutOfBorder(newPositionRow, newPositionCol)) {
             let newPosition = this.findNewAngel(step, newPositionRow, newPositionCol);
 
-            if (this.DEBUG) {
+            if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
                 console.log('|-|- newPosition: ', newPosition);
             }
 
@@ -468,13 +468,13 @@ export default {
         // Пройдемся по по шагам в 4-х направлениях и посмотрим, попадаем ли в пределы карты
         for (let stp = 1; stp <= step; stp++) {
 
-            if (this.DEBUG) {
+            if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
                 console.log((stp <= step));
             }
 
             let newAngel = this.checkNeighboringsCellByDirections(stp, newPositionRow, newPositionCol);
 
-            if (this.DEBUG) {
+            if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
                 console.log('|-|- newAngel: ', newAngel);
             }
             if (newAngel.isFind) {
@@ -489,45 +489,45 @@ export default {
     checkNeighboringsCellByDirections: function (stp, newPositionRow, newPositionCol) {
         let directionLeft = this.checkCellByDirectionLeft(stp, newPositionRow, newPositionCol);
         if (directionLeft.isFind) {
-            if (this.DEBUG) {
+            if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
                 console.log("directionLeft: true;");
             }
             return directionLeft;
         }
-        if (this.DEBUG) {
+        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log("directionLeft: false;");
         }
 
         let directionTop = this.checkCellByDirectionTop(stp, newPositionRow, newPositionCol);
         if (directionTop.isFind) {
-            if (this.DEBUG) {
+            if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
                 console.log("directionTop: true;");
             }
             return directionTop;
         }
-        if (this.DEBUG) {
+        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log("directionTop: false;");
         }
 
         let directionRight = this.checkCellByDirectionRight(stp, newPositionRow, newPositionCol);
         if (directionRight.isFind) {
-            if (this.DEBUG) {
+            if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
                 console.log("directionRight: true;");
             }
             return directionRight;
         }
-        if (this.DEBUG) {
+        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log("directionRight: false;");
         }
 
         let directionBottom = this.checkCellByDirectionBottom(stp, newPositionRow, newPositionCol);
         if (directionBottom.isFind) {
-            if (this.DEBUG) {
+            if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
                 console.log("directionBottom: true;");
             }
             return directionBottom;
         }
-        if (this.DEBUG) {
+        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log("directionBottom: false;");
         }
 

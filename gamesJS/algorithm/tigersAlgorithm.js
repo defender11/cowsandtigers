@@ -1,8 +1,10 @@
+import constant from "../constant";
 import Algorithm from './algorithm';
 import Entity from './../entity';
 import DieUnit from './../dieUnit';
 import tools from './../tools';
-import Route from './route';
+
+const LOCAL_DEBUG = true;
 
 // TIGERS ALGORITM
 export default class TigersAlgorithm extends Algorithm {
@@ -14,10 +16,16 @@ export default class TigersAlgorithm extends Algorithm {
     }
 
     act (unit, map, indexObject) {
+        if (LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
+            console.log("TIGER: ", unit);
+        }
         // Воозвратить объект с соседними ячейками
-        let neighboringsCellInformation = Route.getNeighboringsCellInformation(map, unit, indexObject, this.distanceView);
+        // let neighboringsCellInformation = map.getMultiLevelCellsInfo(unit, indexObject, this.distanceView);
+        let neighboringsCellInformation = map.getOneLevelCellsInfo(unit);
 
-        console.log("NEIGHBORINGSCELLINFORMATION: ", neighboringsCellInformation);
+        if (LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
+            console.log("NEIGHBORINGSCELLINFORMATION: ", neighboringsCellInformation);
+        }
 
         // let data = this.getAllNeighboringsCellInformation(unit, map, indexObject);
 

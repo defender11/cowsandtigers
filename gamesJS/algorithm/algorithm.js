@@ -1,5 +1,4 @@
 import tools from "../tools";
-import route from "./route";
 
 export default class Algorithm {
     constructor() {
@@ -15,7 +14,7 @@ export default class Algorithm {
             neighboringsCellWithGround;
 
         // Проверим соседнии клетки
-        neighboringsCell = map.checkUnitNeighboringsCell(unit);
+        neighboringsCell = map.getOneLevelCellsInfo(unit);
 
         /**
          * Проверим вокруг еду

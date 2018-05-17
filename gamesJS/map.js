@@ -3,6 +3,9 @@ import Unit from './unit';
 import setting from './setting';
 import DieUnit from './dieUnit';
 import tools from './tools';
+import oneLevelCellsInfo from './algorithm/algorithmFindOneLevelNeighboringsCellInfo';
+import multiLevelCellsInfo from './algorithm/algorithmFindMultiLevelNeighboringsCellInfo';
+
 
 /**
  * Класс работы с картой
@@ -335,158 +338,6 @@ export default class Map {
         return (this.objectsOnMap.length > 0 ? 1 : 0);
     };
 
-
-// Проверим соседнии клетки +
-    checkUnitNeighboringsCell(unit) {
-        if (
-            unit.className == 'tigers'
-            ||
-            unit.className == 'cows'
-        ) {
-
-            let cells = [
-                {
-                    direction: 'top',
-                    exist: false,
-                    content: null
-                },
-                {
-                    direction: 'topRight',
-                    exist: false,
-                    content: null
-                },
-                {
-                    direction: 'right',
-                    exist: false,
-                    content: null
-                },
-                {
-                    direction: 'rightBottom',
-                    exist: false,
-                    content: null
-                },
-                {
-                    direction: 'bottom',
-                    exist: false,
-                    content: null
-                },
-                {
-                    direction: 'leftBottom',
-                    exist: false,
-                    content: null
-                },
-                {
-                    direction: 'left',
-                    exist: false,
-                    content: null
-                },
-                {
-                    direction: 'leftTop',
-                    exist: false,
-                    content: null
-                }
-            ];
-
-            let unitPositionRow = parseInt(unit.positionRow);
-            let unitPositionCol = parseInt(unit.positionCol);
-            // let mapDate = this.mapData;
-
-            // Не забыть про границы карты
-            let border = {
-                top: 0,
-                topRight: this.col,
-                right: this.col,
-                rightBottom: this.col,
-                bottom: this.row,
-                leftBottom: 0,
-                left: 0,
-                leftTop: 0
-            };
-            // console.log(mapDate);
-            // console.log("PL:", unitPositionRow, unitPositionCol);
-
-            // TOP Проверим ячейку с вверху +
-            if ((unitPositionRow - 1) >= border.top) {
-                cells[0].exist = true;
-                cells[0].content = this.mapData[unitPositionRow - 1][unitPositionCol];
-            }
-
-
-            // TOP_RIGHT Проверим ячейку с вверху-вправо +
-            if (
-                (unitPositionRow - 1) >= border.top
-                &&
-                (unitPositionCol + 1) < border.topRight
-            ) {
-                cells[1].exist = true;
-                cells[1].content = this.mapData[unitPositionRow - 1][unitPositionCol + 1];
-            }
-
-
-            // RIGHT Проверим ячейку с вправо +
-            if ((unitPositionCol + 1) < border.right) {
-                cells[2].exist = true;
-                cells[2].content = this.mapData[unitPositionRow][unitPositionCol + 1];
-            }
-
-
-            // RIGHT_BOTTOM Проверим ячейку с вправо-внизу +
-            if (
-                (unitPositionRow + 1) < border.bottom
-                &&
-                (unitPositionCol + 1) < border.rightBottom
-            ) {
-                cells[3].exist = true;
-                cells[3].content = this.mapData[unitPositionRow + 1][unitPositionCol + 1];
-            }
-
-
-            // BOTTOM Проверим ячейку внизу +
-            if ((unitPositionRow + 1) < border.bottom) {
-                cells[4].exist = true;
-                cells[4].content = this.mapData[unitPositionRow + 1][unitPositionCol];
-            }
-
-
-            // LEFT_BOTTOM Проверим ячейку с слева-внизу +
-            if (
-                (unitPositionRow + 1) < border.bottom
-                &&
-                (unitPositionCol - 1) >= border.leftBottom
-            ) {
-                cells[5].exist = true;
-                cells[5].content = this.mapData[unitPositionRow + 1][unitPositionCol - 1];
-            }
-
-
-            // LEFT Проверим ячейку с слева +
-            if ((unitPositionCol - 1) >= border.left) {
-                cells[6].exist = true;
-                cells[6].content = this.mapData[unitPositionRow][unitPositionCol - 1];
-            }
-
-
-            // LEFT_TOP Проверим ячейку с лева-вверху +
-            if (
-                (unitPositionRow - 1) >= border.top
-                &&
-                (unitPositionCol - 1) >= border.left
-            ) {
-                cells[7].exist = true;
-                cells[7].content = this.mapData[unitPositionRow - 1][unitPositionCol - 1];
-            }
-
-            // console.log(this.unit);
-            // console.log(cells);
-            // console.log("ROW: " + unitPositionRow, "COL: " + unitPositionCol );
-
-            return cells;
-        } else {
-            return false;
-        }
-    };
-
-
     /**
      * Отфильтруем ячейки по типу unitType
      * @param neighboringsCell
@@ -554,6 +405,15 @@ export default class Map {
 
     addDieUnitToDieArray(unit) {
         this.dieObjectsOnMap.push(unit);
+    }
+
+//    ALGORITHMS FIND NEIGBORINGS CELL
+
+    getOneLevelCellsInfo (unit) {
+        return oneLevelCellsInfo.get(this, unit);
+    }
+    getMultiLevelCellsInfo (unit, indexObject, steps) {
+        return multiLevelCellsInfo.get(this, unit, indexObject, steps);
     }
 }
 

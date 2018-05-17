@@ -1,3 +1,4 @@
+import constant from './../constant'
 import Algorithm from './algorithm';
 import Entity from './../entity';
 import DieUnit from './../dieUnit';
@@ -13,7 +14,7 @@ export default class CowsAlgorithm  extends Algorithm {
 
     act (unit, map, indexObject) {
 
-        let data = this.getAllNeighboringsCellInformation(unit, map, indexObject);
+        let neighboringsCellInformation = map.getOneLevelCellsInfo(unit);
 
         /**
          * data:
