@@ -1,3 +1,3 @@
 export default {
-    GLOBAL_DEBUG : false
+    GLOBAL_DEBUG : true
 };

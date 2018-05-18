@@ -1,5 +1,5 @@
 'use strict';
-
+import Log from './log';
 import Scene from './scene';
 import setting from './setting';
 
@@ -33,8 +33,8 @@ export default class Game {
         // Создадим игровое поле на сцене
         if (scene.build()) {
 
-            $.lNotify('add','Игра загружена.', 'success');
-            $.lNotify('add',"Нажмите 'Начать игру'.", 'success');
+            Log.showNotify('Игра загружена.', 'success');
+            Log.showNotify("Нажмите 'Начать игру'.", 'success');
 
             // return false;
             let self = this;
@@ -42,11 +42,11 @@ export default class Game {
 
             if (!this.devMode) {
 
-                $.lNotify('add','Игра в обычном режиме.', 'success');
+                Log.showNotify('Игра в обычном режиме.', 'success');
 
                 this.btnStart.addEventListener('click', function () {
 
-                    $.lNotify('add','Игра запущена.', 'success');
+                    Log.showNotify('Игра запущена.', 'success');
                     // Главный Loop
                     loop = setInterval(function (callback) {
                         if (scene.issetObjectOnMap()) {
@@ -63,17 +63,17 @@ export default class Game {
                 this.btnPause.addEventListener('click', function () {
                     clearInterval(loop);
 
-                    $.lNotify('add','Игра остановлена.', 'success');
+                    Log.showNotify('Игра остановлена.', 'success');
                 });
             } else {
                 if (scene.issetObjectOnMap()) {
-                    $.lNotify('add','Игра в режиме разработчика.', 'success');
+                    Log.showNotify('Игра в режиме разработчика.', 'success');
 
                     scene.dieManager();
                     scene.actionOnMap();
                     scene.render();
                 } else {
-                    $.lNotify('add','Конец игры.', 'success');
+                    Log.showNotify('Конец игры.', 'success');
                     self.gameOver();
                 }
             }
@@ -81,6 +81,7 @@ export default class Game {
     }
 
     gameOver () {
+        Log.showNotify('Game Over', 'error');
         alert('Game Over');
         window.location.replace("/");
     }

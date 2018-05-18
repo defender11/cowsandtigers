@@ -1,4 +1,4 @@
-import constant from "../constant";
+import Log from './../log';
 import Algorithm from './algorithm';
 import Entity from './../entity';
 import DieUnit from './../dieUnit';
@@ -19,6 +19,7 @@ export default class TigersAlgorithm extends Algorithm {
         if (LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log("TIGER: ", unit);
         }
+
         // Воозвратить объект с соседними ячейками
         // let neighboringsCellInformation = map.getMultiLevelCellsInfo(unit, indexObject, this.distanceView);
         let neighboringsCellInformation = map.getOneLevelCellsInfo(unit);

@@ -1,3 +1,4 @@
+import Log from './log';
 import Entity from './entity';
 import Unit from './unit';
 import setting from './setting';
