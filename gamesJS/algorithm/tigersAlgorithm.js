@@ -16,17 +16,14 @@ export default class TigersAlgorithm extends Algorithm {
     }
 
     act (unit, map, indexObject) {
-        if (LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
-            console.log("TIGER: ", unit);
-        }
+
+        Log.showDebug([{"TIGER:" : unit}], LOCAL_DEBUG);
 
         // Воозвратить объект с соседними ячейками
         // let neighboringsCellInformation = map.getMultiLevelCellsInfo(unit, indexObject, this.distanceView);
         let neighboringsCellInformation = map.getOneLevelCellsInfo(unit);
 
-        if (LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
-            console.log("NEIGHBORINGSCELLINFORMATION: ", neighboringsCellInformation);
-        }
+        Log.showDebug([{"NEIGHBORINGSCELLINFORMATION: " : neighboringsCellInformation}], LOCAL_DEBUG);
 
         // let data = this.getAllNeighboringsCellInformation(unit, map, indexObject);
 

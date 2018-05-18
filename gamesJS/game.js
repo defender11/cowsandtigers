@@ -1,4 +1,5 @@
 'use strict';
+
 import Log from './log';
 import Scene from './scene';
 import setting from './setting';

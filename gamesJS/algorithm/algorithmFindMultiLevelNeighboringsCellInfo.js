@@ -1,4 +1,4 @@
-import constant from './../constant'
+import Log from './../log';
 
 // Route
 export default {
@@ -8,11 +8,7 @@ export default {
 
     get: function (map, unit, indexObject, steps) {
 
-        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
-            console.log(map.mapData);
-            console.log(unit);
-        }
-        // console.log(unit);
+        Log.showDebug([{"MAPDATA:" : map.mapData},{"UNIT:" : unit}], LOCAL_DEBUG);
 
         let neighboringsCellInformation = [];
 
@@ -21,11 +17,8 @@ export default {
 
         // получим инфо о четырех сторонах на дистанции полученной от Unit
         for (let step = 1; step < steps; step++) {
-            if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
-                console.log('|- step: ' + step);
-            }
 
-            // console.log('|- step: ' + step);
+            Log.showDebug([{"STEP:" : step}], LOCAL_DEBUG);
 
             let neighboringsCell = this.getNeighboringsCell(step, unit, map);
 
@@ -57,9 +50,7 @@ export default {
         // Получим координаты 4-х соторон на основе Unit
         let unitSides = this.getUnitAnglePoints(step, unit.positionRow, unit.positionCol);
 
-        if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
-            console.log("|-- unitSides", unitSides);
-        }
+        Log.showDebug([{"UNITSIDES:" : unitSides}], LOCAL_DEBUG);
 
         // Нужно получить ячейки на основе найденых сторон!!!
 
@@ -68,14 +59,11 @@ export default {
 
             if (unitSides[side].isset) {
 
-                console.log('side', side);
-                console.log('side_name', unitSides[side].name);
-
-                if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
-                    console.log("|--- START side: " + unitSides[side].name);
-                    console.log("|--- side: ", unitSides[side]);
-                }
-                console.log("|--- side: ", unitSides[side]);
+                Log.showDebug([
+                        {"SIDE:" : unitSides[side]},
+                        {"SIDE_NAME:" : unitSides[side].name}
+                    ],
+                    LOCAL_DEBUG);
 
                 let param = {
                     unitSide: unitSides[side],
@@ -83,7 +71,8 @@ export default {
                     unitPositionCol: unit.positionCol,
                     map: map
                 };
-                console.log('param: ', param);
+
+                Log.showDebug([{"PARAM:" : param}], LOCAL_DEBUG);
 
                 switch (parseInt(unitSides[side].id)) {
                     // leftTop_TO_rightTop
@@ -117,11 +106,7 @@ export default {
                         break;
                 }
 
-
-                if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
-                    console.log("|--- END side: " + unitSides[side].name);
-                }
-
+                Log.showDebug([{"SIDE END:" : unitSides[side].name}], LOCAL_DEBUG);
             }
         }
         return neighboringsCellInfo;
@@ -226,6 +211,7 @@ export default {
             rightBottom,
             leftBottom;
 
+        
         if (this.LOCAL_DEBUG || constant.GLOBAL_DEBUG) {
             console.log('|- getUnitAnglePoints: ', step, positionRow, positionCol);
         }
